@@ -861,7 +861,7 @@
                 <form method="POST" id="proposalForm">
                     @csrf
 
-                    <label for="proposal_details">Proposal Details</label>
+                    <label for="proposal_details">Terms & Conditions</label>
                     <textarea
                         id="proposal_details"
                         name="proposal_details"
