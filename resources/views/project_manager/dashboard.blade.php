@@ -377,8 +377,8 @@
         }
 
         .status-form select,
-        .proposal-form textarea,
-        .proposal-form input {
+        .modal-content textarea,
+        .modal-content input {
             width: 100%;
             border: 1px solid #d1d5db;
             border-radius: 8px;
@@ -418,16 +418,6 @@
             background: #047857;
         }
 
-        .proposal-form {
-            display: grid;
-            gap: 6px;
-        }
-
-        .proposal-form textarea {
-            min-height: 48px;
-            resize: vertical;
-        }
-
         .view-pdf-btn {
             height: 32px;
             border-radius: 8px;
@@ -464,6 +454,78 @@
             padding: 25px;
         }
 
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            width: 550px;
+            max-width: 92%;
+            border-radius: 14px;
+            padding: 25px;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 18px;
+            color: #003f35;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 18px;
+            top: 12px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        .modal-content label {
+            display: block;
+            font-weight: bold;
+            margin: 12px 0 6px;
+            color: #374151;
+        }
+
+        .modal-content textarea,
+        .modal-content input {
+            font-size: 14px;
+            padding: 11px;
+            margin-top: 4px;
+            margin-bottom: 10px;
+        }
+
+        .modal-content textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .submit-proposal-btn {
+            margin-top: 18px;
+            width: 100%;
+            background: #003f35;
+            color: white;
+            border: none;
+            padding: 13px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .submit-proposal-btn:hover {
+            background: #047857;
+        }
+
+        /* Responsive Breakpoints */
         @media (max-width: 1200px) {
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -749,13 +811,11 @@
                                             <div class="action-box">
                                                 <form method="POST" action="{{ route('project.request.status.update', $request->id) }}" class="status-form">
                                                     @csrf
-
                                                     <select name="status" required>
                                                         <option value="Pending" {{ $request->status === 'Pending' ? 'selected' : '' }}>Pending</option>
                                                         <option value="In Review" {{ $request->status === 'In Review' ? 'selected' : '' }}>In Review</option>
                                                         <option value="Proposal Sent" {{ $request->status === 'Proposal Sent' ? 'selected' : '' }}>Proposal Sent</option>
                                                     </select>
-
                                                     <button type="submit" class="update-btn">Update</button>
                                                 </form>
 
@@ -766,15 +826,9 @@
                                                     </a>
                                                 @endif
 
-                                                <form method="POST" action="{{ route('proposal.store', $request->id) }}" class="proposal-form">
-                                                    @csrf
-
-                                                    <textarea name="proposal_details" placeholder="Proposal details" required></textarea>
-                                                    <input type="number" name="total_budget" placeholder="Total budget" required>
-                                                    <input type="text" name="estimated_duration" placeholder="Duration e.g. 6 Months" required>
-
-                                                    <button type="submit" class="proposal-btn">Create PDF</button>
-                                                </form>
+                                                <button type="button" class="proposal-btn" onclick="openProposalModal('{{ $request->id }}')">
+                                                    Create Proposal
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -796,9 +850,71 @@
             </div>
 
         </div>
+
+        <!-- Proposal Modal -->
+        <div id="proposalModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeProposalModal()">&times;</span>
+
+                <h2>Create Proposal</h2>
+
+                <form method="POST" id="proposalForm">
+                    @csrf
+
+                    <label for="proposal_details">Proposal Details</label>
+                    <textarea
+                        id="proposal_details"
+                        name="proposal_details"
+                        placeholder="Enter proposal details"
+                        required></textarea>
+
+                    <label for="total_budget">Total Budget</label>
+                    <input
+                        id="total_budget"
+                        type="number"
+                        name="total_budget"
+                        placeholder="Enter total budget"
+                        required>
+
+                    <label for="estimated_duration">Estimated Duration</label>
+                    <input
+                        id="estimated_duration"
+                        type="text"
+                        name="estimated_duration"
+                        placeholder="Estimated duration (e.g. 6 Months)"
+                        required>
+
+                    <button type="submit" class="submit-proposal-btn">
+                        Create PDF
+                    </button>
+                </form>
+            </div>
+        </div>
     </main>
 
 </div>
+
+<script>
+function openProposalModal(requestId) {
+    const modal = document.getElementById('proposalModal');
+    const form = document.getElementById('proposalForm');
+
+    form.action = '/project-request/' + requestId + '/proposal';
+    modal.style.display = 'flex';
+}
+
+function closeProposalModal() {
+    document.getElementById('proposalModal').style.display = 'none';
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById('proposalModal');
+
+    if (event.target === modal) {
+        closeProposalModal();
+    }
+}
+</script>
 
 </body>
 </html>
