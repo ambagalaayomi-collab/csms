@@ -628,9 +628,9 @@
             <li><a href="#" class="active"><span><i class="fa-solid fa-house"></i></span> Dashboard</a></li>
             <li><a href="#recentRequests"><span><i class="fa-solid fa-clipboard-list"></i></span> My Requests</a></li>
             <li><a href="#myProposals"><span><i class="fa-solid fa-file-signature"></i></span> Proposals</a></li>
-            <li><a href="#"><span><i class="fa-solid fa-circle-check"></i></span> Approvals</a></li>
-            <li><a href="#"><span><i class="fa-solid fa-chart-line"></i></span> Project Progress</a></li>
-            <li><a href="#"><span><i class="fa-solid fa-gear"></i></span> Settings</a></li>
+            <!-- <li><a href="#"><span><i class="fa-solid fa-circle-check"></i></span> Approvals</a></li>
+            <li><a href="#"><span><i class="fa-solid fa-chart-line"></i></span> Project Progress</a></li> -->
+            <!-- <li><a href="#"><span><i class="fa-solid fa-gear"></i></span> Settings</a></li> -->
 
             <li>
                 <form method="POST" action="{{ route('logout') }}" class="logout-form">

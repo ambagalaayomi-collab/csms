@@ -43,9 +43,9 @@ Route::get('/register', function () {
     return redirect('/');
 });
 
-/*
- REGISTER
-*/
+
+//  REGISTER
+
 Route::post('/register', function (Request $request) {
 
     $request->validate([
