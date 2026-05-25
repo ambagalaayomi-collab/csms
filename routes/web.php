@@ -10,11 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 
-/*
-|--------------------------------------------------------------------------
-| HOME
-|--------------------------------------------------------------------------
-*/
+//  HOME
 Route::get('/', function () {
 
     if (Auth::check()) {
@@ -35,11 +31,10 @@ Route::get('/', function () {
 
 })->name('home');
 
-/*
-|--------------------------------------------------------------------------
-| LOGIN / REGISTER PAGE REDIRECT
-|--------------------------------------------------------------------------
-*/
+
+//  LOGIN / REGISTER PAGE REDIRECT
+
+
 Route::get('/login', function () {
     return redirect('/');
 });
@@ -49,9 +44,7 @@ Route::get('/register', function () {
 });
 
 /*
-|--------------------------------------------------------------------------
-| REGISTER
-|--------------------------------------------------------------------------
+ REGISTER
 */
 Route::post('/register', function (Request $request) {
 
@@ -75,11 +68,7 @@ Route::post('/register', function (Request $request) {
 
 })->name('register');
 
-/*
-|--------------------------------------------------------------------------
-| LOGIN
-|--------------------------------------------------------------------------
-*/
+//  LOGIN
 Route::post('/login', function (Request $request) {
 
     $request->validate([
@@ -118,11 +107,8 @@ Route::post('/login', function (Request $request) {
 
 })->name('login');
 
-/*
-|--------------------------------------------------------------------------
-| LOGOUT
-|--------------------------------------------------------------------------
-*/
+//  LOGOUT
+
 Route::post('/logout', function (Request $request) {
 
     Auth::logout();
@@ -134,11 +120,11 @@ Route::post('/logout', function (Request $request) {
 
 })->name('logout');
 
-/*
-|--------------------------------------------------------------------------
-| CLIENT PROJECT REQUEST PAGE
-|--------------------------------------------------------------------------
-*/
+
+
+// CLIENT PROJECT REQUEST PAGE
+
+
 Route::get('/client/request-project', function () {
 
     if (!Auth::check() || Auth::user()->role !== 'client') {
@@ -151,11 +137,9 @@ Route::get('/client/request-project', function () {
 
 })->name('client.request.project');
 
-/*
-|--------------------------------------------------------------------------
-| CLIENT PROJECT REQUEST STORE
-|--------------------------------------------------------------------------
-*/
+
+//  CLIENT PROJECT REQUEST STORE
+
 Route::post('/project-request/store', function (Request $request) {
 
     if (!Auth::check() || Auth::user()->role !== 'client') {
@@ -197,11 +181,10 @@ Route::post('/project-request/store', function (Request $request) {
 
 })->name('project.request.store');
 
-/*
-|--------------------------------------------------------------------------
-| PROJECT MANAGER: REQUEST STATUS UPDATE
-|--------------------------------------------------------------------------
-*/
+
+
+//  PROJECT MANAGER: REQUEST STATUS UPDATE
+
 Route::post('/project-request/{id}/status', function (Request $request, $id) {
 
     if (!Auth::check() || Auth::user()->role !== 'project_manager') {
@@ -221,11 +204,10 @@ Route::post('/project-request/{id}/status', function (Request $request, $id) {
 
 })->name('project.request.status.update');
 
-/*
-|--------------------------------------------------------------------------
-| PROJECT MANAGER: CREATE PROPOSAL PDF
-|--------------------------------------------------------------------------
-*/
+
+//  PROJECT MANAGER: CREATE PROPOSAL PDF
+
+
 Route::post('/project-request/{id}/proposal', function (Request $request, $id) {
 
     if (!Auth::check() || Auth::user()->role !== 'project_manager') {
@@ -273,11 +255,9 @@ Route::post('/project-request/{id}/proposal', function (Request $request, $id) {
 
 })->name('proposal.store');
 
-/*
-|--------------------------------------------------------------------------
-| CLIENT: PROPOSAL RESPONSE
-|--------------------------------------------------------------------------
-*/
+//  CLIENT: PROPOSAL RESPONSE
+
+
 Route::post('/proposal/{id}/respond', function (Request $request, $id) {
 
     if (!Auth::check() || Auth::user()->role !== 'client') {
@@ -312,11 +292,10 @@ Route::post('/proposal/{id}/respond', function (Request $request, $id) {
 
 })->name('proposal.respond');
 
-/*
-|--------------------------------------------------------------------------
-| PROJECT MANAGER: PROPOSAL STATUS UPDATE
-|--------------------------------------------------------------------------
-*/
+
+
+//  PROJECT MANAGER: PROPOSAL STATUS UPDATE
+
 Route::post('/proposal/{id}/status', function (Request $request, $id) {
 
     if (!Auth::check() || Auth::user()->role !== 'project_manager') {
@@ -348,11 +327,9 @@ Route::post('/proposal/{id}/status', function (Request $request, $id) {
 
 })->name('proposal.status.update');
 
-/*
-|--------------------------------------------------------------------------
-| DASHBOARDS
-|--------------------------------------------------------------------------
-*/
+
+//  DASHBOARDS
+
 Route::middleware('auth')->group(function () {
 
     Route::get('/client/dashboard', function () {
