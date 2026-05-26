@@ -751,7 +751,7 @@
     </div>
 </header>
 
-<!-- HERO SECTION -->
+ <!-- */HERO SECTION -->
 <section class="hero">
     <div class="hero-content">
         <h1>
@@ -764,11 +764,14 @@
             and client approval in one efficient web-based platform.
         </p>
 
-      <!-- <div class="hero-actions">
+      <div class="hero-actions">
+        
             <a href="{{ route('client.request.project') }}" class="dashboard-btn">
-               Login to System
+                <i class="fa-solid fa-paper-plane"></i>
+               Submit Request
+               
             </a>
-        </div>-->
+        </div>
     </div>
 
     <div class="hero-features">
