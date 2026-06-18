@@ -175,7 +175,7 @@
     <h2>Cost Breakdown</h2>
 
     <table>
-        <tr>
+        <!-- <tr>
             <th>Labor Cost</th>
             <td>LKR __________________</td>
         </tr>
@@ -188,7 +188,7 @@
         <tr>
             <th>Equipment Cost</th>
             <td>LKR __________________</td>
-        </tr>
+        </tr> -->
 
         <tr>
             <th>Total Estimated Cost</th>

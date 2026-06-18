@@ -369,30 +369,31 @@
             gap: 7px;
         }
 
-        .status-form {
+        .status-form, .assign-form {
             display: grid;
             gap: 6px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .status-form {
             padding-bottom: 7px;
             border-bottom: 1px solid #e5e7eb;
         }
 
-        .status-form select,
-        .modal-content textarea,
-        .modal-content input {
+        .status-form select {
             width: 100%;
             border: 1px solid #d1d5db;
             border-radius: 8px;
             padding: 7px;
             font-size: 11.5px;
             outline: none;
-        }
-
-        .status-form select {
             height: 34px;
         }
 
         .update-btn,
-        .proposal-btn {
+        .proposal-btn,
+        .assign-btn {
             height: 34px;
             border: none;
             border-radius: 8px;
@@ -400,23 +401,21 @@
             font-size: 12px;
             font-weight: bold;
             cursor: pointer;
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
-        .update-btn {
-            background: #007a5c;
-        }
+        .update-btn { background: #007a5c; }
+        .update-btn:hover { background: #005f48; }
 
-        .proposal-btn {
-            background: #003f35;
-        }
+        .proposal-btn { background: #003f35; }
+        .proposal-btn:hover { background: #047857; }
 
-        .update-btn:hover {
-            background: #005f48;
-        }
-
-        .proposal-btn:hover {
-            background: #047857;
-        }
+        .assign-btn { background: #f59e0b; color: #111827; }
+        .assign-btn:hover { background: #d97706; }
 
         .view-pdf-btn {
             height: 32px;
@@ -498,6 +497,10 @@
 
         .modal-content textarea,
         .modal-content input {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            outline: none;
             font-size: 14px;
             padding: 11px;
             margin-top: 4px;
@@ -666,6 +669,13 @@
                 </div>
             @endif
 
+            @if(session('assign_success'))
+                <div class="success-message">
+                    <i class="fa-solid fa-circle-check"></i>
+                    {{ session('assign_success') }}
+                </div>
+            @endif
+
             <div class="stats-grid">
 
                 <div class="card">
@@ -805,7 +815,9 @@
                                             @endif
                                         </td>
 
-                                        <td>{{ $request->created_at ? $request->created_at->format('M d, Y') : '-' }}</td>
+                                        <td>
+                                            {{ $request->created_at ? $request->created_at->diffForHumans() : '-' }}
+                                        </td>
 
                                         <td>
                                             <div class="action-box">
@@ -816,13 +828,19 @@
                                                         <option value="In Review" {{ $request->status === 'In Review' ? 'selected' : '' }}>In Review</option>
                                                         <option value="Proposal Sent" {{ $request->status === 'Proposal Sent' ? 'selected' : '' }}>Proposal Sent</option>
                                                     </select>
-                                                    <button type="submit" class="update-btn">Update</button>
+                                                    <button type="submit" class="update-btn">Update Status</button>
+                                                </form>
+
+                                                <form action="{{ route('manager.requests.assign', $request->id) }}" method="POST" class="assign-form">
+                                                    @csrf
+                                                    <button type="submit" class="assign-btn">
+                                                        <i class="fa-solid fa-paper-plane"></i> Send To Engineer
+                                                    </button>
                                                 </form>
 
                                                 @if($latestProposal && $latestProposal->pdf_path)
                                                     <a href="{{ asset('storage/' . $latestProposal->pdf_path) }}" target="_blank" class="view-pdf-btn">
-                                                        <i class="fa-solid fa-file-pdf"></i>
-                                                        View PDF
+                                                        <i class="fa-solid fa-file-pdf"></i> View PDF
                                                     </a>
                                                 @endif
 
@@ -831,6 +849,7 @@
                                                 </button>
                                             </div>
                                         </td>
+                                        
                                     </tr>
                                 @empty
                                     <tr>
@@ -851,7 +870,6 @@
 
         </div>
 
-        <!-- Proposal Modal -->
         <div id="proposalModal" class="modal">
             <div class="modal-content">
                 <span class="close-btn" onclick="closeProposalModal()">&times;</span>

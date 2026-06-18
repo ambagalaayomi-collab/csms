@@ -33,8 +33,6 @@ Route::get('/', function () {
 
 
 //  LOGIN / REGISTER PAGE REDIRECT
-
-
 Route::get('/login', function () {
     return redirect('/');
 });
@@ -45,7 +43,6 @@ Route::get('/register', function () {
 
 
 //  REGISTER
-
 Route::post('/register', function (Request $request) {
 
     $request->validate([
@@ -108,7 +105,6 @@ Route::post('/login', function (Request $request) {
 })->name('login');
 
 //  LOGOUT
-
 Route::post('/logout', function (Request $request) {
 
     Auth::logout();
@@ -121,10 +117,7 @@ Route::post('/logout', function (Request $request) {
 })->name('logout');
 
 
-
 // CLIENT PROJECT REQUEST PAGE
-
-
 Route::get('/client/request-project', function () {
 
     if (!Auth::check() || Auth::user()->role !== 'client') {
@@ -139,7 +132,6 @@ Route::get('/client/request-project', function () {
 
 
 //  CLIENT PROJECT REQUEST STORE
-
 Route::post('/project-request/store', function (Request $request) {
 
     if (!Auth::check() || Auth::user()->role !== 'client') {
@@ -155,7 +147,7 @@ Route::post('/project-request/store', function (Request $request) {
         'project_type' => 'required|string|max:100',
         'location' => 'required|string|max:255',
         'width' => 'required|numeric|min:0',
-'height' => 'required|numeric|min:0',
+        'height' => 'required|numeric|min:0',
         'budget' => 'required|numeric|min:0',
         'timeline' => 'required|string|max:100',
         'requirements' => 'required|string',
@@ -169,7 +161,7 @@ Route::post('/project-request/store', function (Request $request) {
         'project_type' => $validated['project_type'],
         'location' => $validated['location'],
         'width' => $validated['width'],
-'height' => $validated['height'],
+        'height' => $validated['height'],
         'budget' => $validated['budget'],
         'timeline' => $validated['timeline'],
         'requirements' => $validated['requirements'],
@@ -182,9 +174,7 @@ Route::post('/project-request/store', function (Request $request) {
 })->name('project.request.store');
 
 
-
 //  PROJECT MANAGER: REQUEST STATUS UPDATE
-
 Route::post('/project-request/{id}/status', function (Request $request, $id) {
 
     if (!Auth::check() || Auth::user()->role !== 'project_manager') {
@@ -206,8 +196,6 @@ Route::post('/project-request/{id}/status', function (Request $request, $id) {
 
 
 //  PROJECT MANAGER: CREATE PROPOSAL PDF
-
-
 Route::post('/project-request/{id}/proposal', function (Request $request, $id) {
 
     if (!Auth::check() || Auth::user()->role !== 'project_manager') {
@@ -255,9 +243,8 @@ Route::post('/project-request/{id}/proposal', function (Request $request, $id) {
 
 })->name('proposal.store');
 
+
 //  CLIENT: PROPOSAL RESPONSE
-
-
 Route::post('/proposal/{id}/respond', function (Request $request, $id) {
 
     if (!Auth::check() || Auth::user()->role !== 'client') {
@@ -293,9 +280,7 @@ Route::post('/proposal/{id}/respond', function (Request $request, $id) {
 })->name('proposal.respond');
 
 
-
 //  PROJECT MANAGER: PROPOSAL STATUS UPDATE
-
 Route::post('/proposal/{id}/status', function (Request $request, $id) {
 
     if (!Auth::check() || Auth::user()->role !== 'project_manager') {
@@ -328,10 +313,34 @@ Route::post('/proposal/{id}/status', function (Request $request, $id) {
 })->name('proposal.status.update');
 
 
-//  DASHBOARDS
+// PROJECT MANAGER: ASSIGN ENGINEER
+Route::post('/manager/requests/{id}/assign', function ($id) {
 
+    if (!Auth::check() || Auth::user()->role !== 'project_manager') {
+        abort(403);
+    }
+
+    $engineer = User::where('role', 'engineer')->first();
+
+    if (!$engineer) {
+        return back()->with('error', 'No engineer found.');
+    }
+
+    $projectRequest = ProjectRequest::findOrFail($id);
+    $projectRequest->assigned_engineer_id = $engineer->id;
+    $projectRequest->due_date = now()->addDays(7);
+    $projectRequest->status = 'Assigned';
+    $projectRequest->save();
+
+    return back()->with('success', 'Request sent to engineer successfully.');
+
+})->name('manager.requests.assign');
+
+
+//  DASHBOARDS
 Route::middleware('auth')->group(function () {
 
+    // CLIENT DASHBOARD
     Route::get('/client/dashboard', function () {
 
         if (Auth::user()->role !== 'client') {
@@ -364,6 +373,7 @@ Route::middleware('auth')->group(function () {
 
     })->name('client.dashboard');
 
+    // PROJECT MANAGER DASHBOARD
     Route::get('/project-manager/dashboard', function () {
 
         if (Auth::user()->role !== 'project_manager') {
@@ -406,14 +416,58 @@ Route::middleware('auth')->group(function () {
 
     })->name('project_manager.dashboard');
 
+    // ENGINEER DASHBOARD
     Route::get('/engineer/dashboard', function () {
 
         if (Auth::user()->role !== 'engineer') {
             abort(403);
         }
 
-        return view('engineer.dashboard');
+        $assignedRequests = ProjectRequest::where(
+            'assigned_engineer_id',
+            Auth::id()
+        )->latest()->get();
+
+        $assignedCount = $assignedRequests->count();
+
+        return view('engineer.dashboard', compact(
+            'assignedRequests',
+            'assignedCount'
+        ));
 
     })->name('engineer.dashboard');
+
+    // 🔴 ENGINEER: STATUS UPDATE POST ROUTE (අලුතින්ම එකතු කල කොටස)
+    Route::post('/engineer/status-update', function (Request $request) {
+        
+        if (!Auth::check() || Auth::user()->role !== 'engineer') {
+            abort(403);
+        }
+
+        $request->validate([
+            'request_id' => 'required|exists:project_requests,id',
+            'status' => 'required|string',
+            'remarks' => 'required|string',
+        ]);
+
+        $projectRequest = ProjectRequest::findOrFail($request->request_id);
+        
+        // Security check: මේ Request එක අදාළ Engineer ටමද Assign කරලා තියෙන්නේ බලන්න
+        if ($projectRequest->assigned_engineer_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Status එක Update කිරීම
+        $projectRequest->status = $request->status;
+        
+        //remarks සේව් කරන්න ඔයාගේ DB එකේ තීරුවක් තියෙනවා නම් මෙතනින් එකතු කරන්න:
+        // $projectRequest->remarks = $request->remarks; 
+        
+        $projectRequest->save();
+
+        return redirect()->route('engineer.dashboard')
+            ->with('success', 'Status updated successfully!');
+
+    })->name('engineer.status.update');
 
 });

@@ -28,6 +28,9 @@ return new class extends Migration
                 $table->string('timeline');
                 $table->text('requirements');
                 $table->string('status')->default('Pending');
+                $table->foreignId('assigned_engineer_id')->nullable()->constrained('users')->onDelete('set null');
+                $table->date('due_date')->nullable();
+                $table->string('status')->default('Pending');
 
                 $table->timestamps();
             });

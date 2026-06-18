@@ -5,7 +5,6 @@
     <title>Engineer Dashboard | CSMS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
@@ -33,6 +32,7 @@
             color: white;
             padding: 22px 16px;
             border-radius: 0 18px 18px 0;
+            transition: width 0.3s ease;
         }
 
         .logo {
@@ -113,6 +113,21 @@
             margin: 0;
             padding: 0;
             width: 100%;
+        }
+
+        /* Sidebar Collapsed State */
+        .sidebar.collapsed {
+            width: 90px;
+        }
+        .sidebar.collapsed .logo-left span,
+        .sidebar.collapsed .menu a text,
+        .sidebar.collapsed .logout-form button text {
+            display: none;
+        }
+        .sidebar.collapsed .menu a,
+        .sidebar.collapsed .logout-form button {
+            justify-content: center;
+            padding: 13px 0;
         }
 
         /* Main */
@@ -220,7 +235,7 @@
             background: white;
             border-radius: 14px;
             padding: 22px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 166px rgba(0,0,0,0.06);
             border: 1px solid #e5e7eb;
         }
 
@@ -311,37 +326,16 @@
             font-size: 13px;
         }
 
-        .status {
+        .status-badge {
             padding: 5px 10px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: bold;
         }
 
-        .in-progress {
-            background: #fef3c7;
-            color: #b45309;
-        }
-
-        .pending {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .completed {
-            background: #dcfce7;
-            color: #15803d;
-        }
-
-        .draft {
-            background: #fef3c7;
-            color: #b45309;
-        }
-
-        .submitted {
-            background: #dcfce7;
-            color: #15803d;
-        }
+        .status-pending { background: #fee2e2; color: #b91c1c; }
+        .status-progress { background: #fef3c7; color: #b45309; }
+        .status-completed { background: #dcfce7; color: #15803d; }
 
         .table-footer {
             text-align: center;
@@ -355,7 +349,7 @@
             font-size: 13px;
         }
 
-        /* Status update */
+        /* Status update form */
         .form-group {
             margin-bottom: 14px;
         }
@@ -368,6 +362,7 @@
             padding: 12px;
             font-size: 14px;
             outline: none;
+            background-color: white;
         }
 
         .form-group textarea {
@@ -384,6 +379,8 @@
             color: white;
             font-weight: bold;
             cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s ease;
         }
 
         .submit-btn:hover {
@@ -467,55 +464,14 @@
                 width: 100%;
                 border-radius: 0;
             }
-            .menu-icon {
-    cursor: pointer;
-    font-size: 24px;
-    color: white;
-}
-
-.sidebar.collapsed {
-    width: 90px;
-}
-
-.sidebar.collapsed .logo-left span {
-    display: none;
-}
-
-.sidebar.collapsed .menu a {
-    justify-content: center;
-    font-size: 0;
-}
-
-.sidebar.collapsed .menu a span {
-    font-size: 20px;
-}
-
-.sidebar.collapsed .logout-form button {
-    justify-content: center;
-    font-size: 0;
-}
-
-.sidebar.collapsed .logout-form button span {
-    font-size: 20px;
-}
         }
     </style>
-    <script>
-    const toggleBtn = document.getElementById('toggleSidebar');
-    const sidebar = document.getElementById('sidebar');
-
-    toggleBtn.addEventListener('click', function () {
-        sidebar.classList.toggle('collapsed');
-    });
-</script>
 </head>
 <body>
-    
 
 <div class="dashboard">
 
-    <!-- Sidebar -->
-   <aside class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="logo">
             <div class="logo-left">
                 <div class="logo-icon">
@@ -523,37 +479,32 @@
                 </div>
                 <span>CSMS</span>
             </div>
-
             <div class="menu-icon" id="toggleSidebar">
                 <i class="fa-solid fa-bars"></i>
             </div>
         </div>
 
         <ul class="menu">
-            <li><a href="#" class="active"><span><i class="fa-solid fa-house"></i></span> Dashboard</a></li>
-            <li><a href="#"><span><i class="fa-solid fa-list-check"></i></span> Assigned Requests</a></li>
-            <li><a href="#"><span><i class="fa-solid fa-ruler-combined"></i></span> Measurements</a></li>
-            <li><a href="#"><span><i class="fa-solid fa-calculator"></i></span> Estimates</a></li>
-            <li><a href="#"><span><i class="fa-solid fa-file-lines"></i></span> Technical Reports</a></li>
-            <li><a href="#"><span><i class="fa-solid fa-chart-line"></i></span> Status Updates</a></li>
-            <li><a href="#"><span><i class="fa-solid fa-boxes-stacked"></i></span> Materials</a></li>
-           
-
+            <li><a href="#" class="active"><span><i class="fa-solid fa-house"></i></span> <text>Dashboard</text></a></li>
+            <li><a href="#"><span><i class="fa-solid fa-list-check"></i></span> <text>Assigned Requests</text></a></li>
+            <li><a href="#"><span><i class="fa-solid fa-ruler-combined"></i></span> <text>Measurements</text></a></li>
+            <li><a href="#"><span><i class="fa-solid fa-calculator"></i></span> <text>Estimates</text></a></li>
+            <li><a href="#"><span><i class="fa-solid fa-file-lines"></i></span> <text>Technical Reports</text></a></li>
+            <li><a href="#"><span><i class="fa-solid fa-chart-line"></i></span> <text>Status Updates</text></a></li>
+            <li><a href="#"><span><i class="fa-solid fa-boxes-stacked"></i></span> <text>Materials</text></a></li>
             <li>
                 <form method="POST" action="{{ route('logout') }}" class="logout-form">
                     @csrf
                     <button type="submit">
-                        <span><i class="fa-solid fa-right-from-bracket"></i></span> Logout
+                        <span><i class="fa-solid fa-right-from-bracket"></i></span> <text>Logout</text>
                     </button>
                 </form>
             </li>
         </ul>
     </aside>
 
-    <!-- Main -->
     <main class="main">
 
-        <!-- Topbar -->
         <div class="topbar">
             <h1>Engineer Dashboard</h1>
 
@@ -562,11 +513,9 @@
                     <i class="fa-solid fa-bell"></i>
                     <span class="badge">3</span>
                 </div>
-
                 <div class="icon-btn">
                     <i class="fa-solid fa-circle-question"></i>
                 </div>
-
                 <div class="user">
                     <div class="avatar">
                         <i class="fa-solid fa-user-gear"></i>
@@ -581,14 +530,13 @@
 
         <div class="content">
 
-            @if(session('login_success'))
+            @if(session('success'))
                 <div class="success-message">
                     <i class="fa-solid fa-circle-check"></i>
-                    {{ session('login_success') }}
+                    {{ session('success') }}
                 </div>
             @endif
 
-            <!-- Stat Cards -->
             <div class="stats-grid">
                 <div class="card">
                     <div class="stat-title">
@@ -597,7 +545,7 @@
                         </div>
                         <span>Assigned Requests</span>
                     </div>
-                    <div class="stat-number">6</div>
+                    <div class="stat-number">{{ $assignedRequests->count() }}</div>
                     <div class="stat-text">Active Assignments</div>
                     <a href="#" class="view-link">View All</a>
                 </div>
@@ -639,11 +587,10 @@
                 </div>
             </div>
 
-            <!-- Middle Section -->
             <div class="main-grid">
+                
                 <div class="card">
                     <h3 class="card-title">My Assigned Requests</h3>
-
                     <table>
                         <thead>
                             <tr>
@@ -654,42 +601,26 @@
                                 <th>Status</th>
                             </tr>
                         </thead>
-
                         <tbody>
-                            <tr>
-                                <td>R-2024-056</td>
-                                <td>Office Renovation</td>
-                                <td>John Doe</td>
-                                <td>May 30, 2024</td>
-                                <td><span class="status in-progress">In Progress</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>R-2024-049</td>
-                                <td>Site Office Construction</td>
-                                <td>John Doe</td>
-                                <td>May 28, 2024</td>
-                                <td><span class="status in-progress">In Progress</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>R-2024-047</td>
-                                <td>Community Hall</td>
-                                <td>ABC Corp</td>
-                                <td>May 25, 2024</td>
-                                <td><span class="status pending">Pending</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>R-2024-039</td>
-                                <td>Boundary Wall</td>
-                                <td>XYZ Ltd.</td>
-                                <td>May 27, 2024</td>
-                                <td><span class="status pending">Pending</span></td>
-                            </tr>
+                            @forelse($assignedRequests as $request)
+                                <tr>
+                                    <td>R-{{ $request->id }}</td>
+                                    <td>{{ $request->project_type ?? $request->title }}</td>
+                                    <td>{{ $request->name ?? $request->client_name }}</td>
+                                    <td>{{ $request->due_date ?? 'Not set' }}</td>
+                                    <td>
+                                        <span class="status-badge {{ $request->status == 'Completed' ? 'status-completed' : ($request->status == 'In Progress' ? 'status-progress' : 'status-pending') }}">
+                                            {{ $request->status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: #6b7280;">No assigned requests found</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
-
                     <div class="table-footer">
                         <a href="#">View All Assignments</a>
                     </div>
@@ -698,30 +629,33 @@
                 <div class="card">
                     <h3 class="card-title">Status Update</h3>
 
-                    <form method="POST" action="#">
+                    <form method="POST" action="{{ route('engineer.status.update') }}">
                         @csrf
 
                         <div class="form-group">
                             <select name="request_id" required>
-                                <option value="">Select Request</option>
-                                <option value="R-2024-056">R-2024-056 - Office Renovation</option>
-                                <option value="R-2024-049">R-2024-049 - Site Office Construction</option>
-                                <option value="R-2024-047">R-2024-047 - Community Hall</option>
+                                <option value="" disabled selected>Select Request</option>
+                                @foreach($assignedRequests as $request)
+                                    <option value="{{ $request->id }}">
+                                        R-{{ $request->id }} - {{ $request->project_type ?? $request->title }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
 
                         <div class="form-group">
                             <select name="status" required>
-                                <option value="">Update Status</option>
-                                <option>In Progress</option>
-                                <option>Measurement Completed</option>
-                                <option>Report Submitted</option>
-                                <option>Delayed</option>
+                                <option value="" disabled selected>Update Status</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Measurement Completed">Measurement Completed</option>
+                                <option value="Report Submitted">Report Submitted</option>
+                                <option value="Delayed">Delayed</option>
+                                <option value="Completed">Completed</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <textarea name="remarks" placeholder="Add update remarks..."></textarea>
+                            <textarea name="remarks" placeholder="Add update remarks..." required></textarea>
                         </div>
 
                         <button type="submit" class="submit-btn">
@@ -731,13 +665,11 @@
                 </div>
             </div>
 
-            <!-- Bottom Section -->
             <div class="bottom-grid">
                 <div class="card">
                     <h3 class="card-title">Measurements Verification</h3>
                     <div class="verification-number">14</div>
                     <div class="verification-text">Pending Verification</div>
-
                     <div class="percentage">65%</div>
                     <div class="progress-line">
                         <div class="progress-fill"></div>
@@ -746,30 +678,26 @@
 
                 <div class="card">
                     <h3 class="card-title">Recent Reports</h3>
-
                     <ul class="report-list">
                         <li>
                             <span>TR-2024-056</span>
                             <span>Office Renovation - Structural Report</span>
                             <span>May 30, 2024</span>
-                            <span class="status submitted">Submitted</span>
+                            <span class="status-badge status-completed">Submitted</span>
                         </li>
-
                         <li>
                             <span>TR-2024-055</span>
                             <span>Site Office - Material Report</span>
                             <span>May 28, 2024</span>
-                            <span class="status submitted">Submitted</span>
+                            <span class="status-badge status-completed">Submitted</span>
                         </li>
-
                         <li>
                             <span>TR-2024-054</span>
                             <span>Boundary Wall - Site Inspection</span>
                             <span>May 26, 2024</span>
-                            <span class="status draft">Draft</span>
+                            <span class="status-badge status-progress">Draft</span>
                         </li>
                     </ul>
-
                     <div class="table-footer">
                         <a href="#">View All Reports</a>
                     </div>
@@ -788,6 +716,18 @@
 
 </div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const toggleBtn = document.getElementById('toggleSidebar');
+        const sidebar = document.getElementById('sidebar');
+
+        if(toggleBtn && sidebar) {
+            toggleBtn.addEventListener('click', function () {
+                sidebar.classList.toggle('collapsed');
+            });
+        }
+    });
+</script>
 
 </body>
 </html>
