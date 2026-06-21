@@ -349,7 +349,7 @@
             font-size: 13px;
         }
 
-        /* Status update form */
+        /* Status update form & general forms */
         .form-group {
             margin-bottom: 14px;
         }
@@ -392,6 +392,7 @@
             display: grid;
             grid-template-columns: 0.9fr 1.6fr 0.9fr;
             gap: 22px;
+            margin-bottom: 25px;
         }
 
         .verification-number {
@@ -488,8 +489,16 @@
             <li><a href="#" class="active"><span><i class="fa-solid fa-house"></i></span> <text>Dashboard</text></a></li>
             <li><a href="#"><span><i class="fa-solid fa-list-check"></i></span> <text>Assigned Requests</text></a></li>
             <li><a href="#"><span><i class="fa-solid fa-ruler-combined"></i></span> <text>Measurements</text></a></li>
-            <li><a href="#"><span><i class="fa-solid fa-calculator"></i></span> <text>Estimates</text></a></li>
-            <li><a href="#"><span><i class="fa-solid fa-file-lines"></i></span> <text>Technical Reports</text></a></li>
+            <li>
+                <a href="{{ route('engineer.estimates') }}">
+                    <span><i class="fa fa-calculator"></i></span> <text>Estimates</text>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('engineer.technicalreport.create', ['project_request_id' => 'PR-001']) }}">
+                    <span><i class="fas fa-file-alt"></i></span> <text>Technical Report</text>
+                </a>
+            </li>
             <li><a href="#"><span><i class="fa-solid fa-chart-line"></i></span> <text>Status Updates</text></a></li>
             <li><a href="#"><span><i class="fa-solid fa-boxes-stacked"></i></span> <text>Materials</text></a></li>
             <li>
@@ -545,7 +554,7 @@
                         </div>
                         <span>Assigned Requests</span>
                     </div>
-                    <div class="stat-number">{{ $assignedRequests->count() }}</div>
+                    <div class="stat-number">{{ isset($assignedRequests) ? $assignedRequests->count() : 0 }}</div>
                     <div class="stat-text">Active Assignments</div>
                     <a href="#" class="view-link">View All</a>
                 </div>
@@ -588,7 +597,6 @@
             </div>
 
             <div class="main-grid">
-                
                 <div class="card">
                     <h3 class="card-title">My Assigned Requests</h3>
                     <table>
@@ -602,23 +610,29 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($assignedRequests as $request)
-                                <tr>
-                                    <td>R-{{ $request->id }}</td>
-                                    <td>{{ $request->project_type ?? $request->title }}</td>
-                                    <td>{{ $request->name ?? $request->client_name }}</td>
-                                    <td>{{ $request->due_date ?? 'Not set' }}</td>
-                                    <td>
-                                        <span class="status-badge {{ $request->status == 'Completed' ? 'status-completed' : ($request->status == 'In Progress' ? 'status-progress' : 'status-pending') }}">
-                                            {{ $request->status }}
-                                        </span>
-                                    </td>
-                                </tr>
-                            @empty
+                            @if(isset($assignedRequests))
+                                @forelse($assignedRequests as $request)
+                                    <tr>
+                                        <td>R-{{ $request->id }}</td>
+                                        <td>{{ $request->project_type ?? $request->title }}</td>
+                                        <td>{{ $request->name ?? $request->client_name }}</td>
+                                        <td>{{ $request->due_date ?? 'Not set' }}</td>
+                                        <td>
+                                            <span class="status-badge {{ $request->status == 'Completed' ? 'status-completed' : ($request->status == 'In Progress' ? 'status-progress' : 'status-pending') }}">
+                                                {{ $request->status }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; color: #6b7280;">No assigned requests found</td>
+                                    </tr>
+                                @endforelse
+                            @else
                                 <tr>
                                     <td colspan="5" style="text-align: center; color: #6b7280;">No assigned requests found</td>
                                 </tr>
-                            @endforelse
+                            @endif
                         </tbody>
                     </table>
                     <div class="table-footer">
@@ -628,40 +642,42 @@
 
                 <div class="card">
                     <h3 class="card-title">Status Update</h3>
+                    @if(isset($assignedRequests) && count($assignedRequests) > 0)
+                        <form method="POST" action="{{ route('engineer.status.update') }}">
+                            @csrf
+                            <div class="form-group">
+                                <select name="request_id" required>
+                                    <option value="" disabled selected>Select Request</option>
+                                    @foreach($assignedRequests as $request)
+                                        <option value="{{ $request->id }}">
+                                            R-{{ $request->id }} - {{ $request->project_type ?? $request->title }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                    <form method="POST" action="{{ route('engineer.status.update') }}">
-                        @csrf
+                            <div class="form-group">
+                                <select name="status" required>
+                                    <option value="" disabled selected>Update Status</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Measurement Completed">Measurement Completed</option>
+                                    <option value="Report Submitted">Report Submitted</option>
+                                    <option value="Delayed">Delayed</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                            </div>
 
-                        <div class="form-group">
-                            <select name="request_id" required>
-                                <option value="" disabled selected>Select Request</option>
-                                @foreach($assignedRequests as $request)
-                                    <option value="{{ $request->id }}">
-                                        R-{{ $request->id }} - {{ $request->project_type ?? $request->title }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                            <div class="form-group">
+                                <textarea name="remarks" placeholder="Add update remarks..." required></textarea>
+                            </div>
 
-                        <div class="form-group">
-                            <select name="status" required>
-                                <option value="" disabled selected>Update Status</option>
-                                <option value="In Progress">In Progress</option>
-                                <option value="Measurement Completed">Measurement Completed</option>
-                                <option value="Report Submitted">Report Submitted</option>
-                                <option value="Delayed">Delayed</option>
-                                <option value="Completed">Completed</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <textarea name="remarks" placeholder="Add update remarks..." required></textarea>
-                        </div>
-
-                        <button type="submit" class="submit-btn">
-                            Submit Update
-                        </button>
-                    </form>
+                            <button type="submit" class="submit-btn">
+                                Submit Update
+                            </button>
+                        </form>
+                    @else
+                        <p style="font-size: 13px; color: #6b7280; text-align: center; padding: 20px 0;">No requests available for status updates.</p>
+                    @endif
                 </div>
             </div>
 
