@@ -9,7 +9,7 @@ use App\Models\UnitRate;
 use App\Models\Estimate; // ⚠️ Estimate Model එක මෙතන තියෙන්නම ඕනේ
 use Illuminate\Support\Facades\Auth;
 
-class EstimateController extends Controller
+class TechnicalReportController extends Controller
 {
     /**
      * Estimates Form එක සහ Database Rates පෙන්වීම.

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Http\Controllers\Engineer\ReportController;
+use App\Http\Controllers\Engineer\TechnicalReportController;
 
 // අපේ අලුත් Controller එක උඩින්ම Import කරා
 use App\Http\Controllers\Engineer\EstimateController;
@@ -526,7 +527,31 @@ Route::get('/engineer/technical-report/{project_request_id}', [EstimateControlle
         ->name('engineer.technicalreport.store');
         
         
-Route::post('/engineer/technical-report/store', [ReportController::class, 'store'])->name('engineer.report.store');
+Route::post('/engineer/technical-report/store', [TechnicalReportController::class, 'store'])->name('engineer.report.store');
+// routes/web.php
+
+Route::prefix('engineer')->name('engineer.')->group(function () {
+    
+    // 📊 Dashboard Index (යාවත්කාලීන කරන ලද)
+    Route::get('/dashboard', function () {
+        if (Auth::user()->role !== 'engineer') {
+            abort(403);
+        }
+        
+        // technicalReport සහ estimate එකවර Fetch කර ගැනීම (Eager Loading) 👇
+        $assignedRequests = ProjectRequest::with(['technicalReport', 'estimate'])
+            ->where('assigned_engineer_id', Auth::id())
+            ->latest()
+            ->get();
+            
+        $assignedCount = $assignedRequests->count();
+        return view('engineer.dashboard', compact('assignedRequests', 'assignedCount'));
+    })->name('dashboard');
+
+    // 📄 PDF Generation Routes (Controller එක හරහා ක්‍රියාත්මක කිරීමට)
+    Route::get('/technical-report/{id}/pdf', [TechnicalReportController::class, 'downloadPDF'])->name('technicalreport.pdf');
+    Route::get('/estimate/{id}/pdf', [EstimateController::class, 'downloadPDF'])->name('estimate.pdf');
+});
 });
     
 

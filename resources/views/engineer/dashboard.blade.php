@@ -488,7 +488,7 @@
         <ul class="menu">
             <li><a href="#" class="active"><span><i class="fa-solid fa-house"></i></span> <text>Dashboard</text></a></li>
             <li><a href="#"><span><i class="fa-solid fa-list-check"></i></span> <text>Assigned Requests</text></a></li>
-            <li><a href="#"><span><i class="fa-solid fa-ruler-combined"></i></span> <text>Measurements</text></a></li>
+            <!-- <li><a href="#"><span><i class="fa-solid fa-ruler-combined"></i></span> <text>Measurements</text></a></li> -->
             <li>
                 <a href="{{ route('engineer.estimates') }}">
                     <span><i class="fa fa-calculator"></i></span> <text>Estimates</text>
@@ -556,10 +556,10 @@
                     </div>
                     <div class="stat-number">{{ isset($assignedRequests) ? $assignedRequests->count() : 0 }}</div>
                     <div class="stat-text">Active Assignments</div>
-                    <a href="#" class="view-link">View All</a>
+                    
                 </div>
 
-                <div class="card">
+                <!-- <div class="card">
                     <div class="stat-title">
                         <div class="stat-icon green">
                             <i class="fa-solid fa-ruler-combined"></i>
@@ -569,9 +569,9 @@
                     <div class="stat-number">14</div>
                     <div class="stat-text">Pending Verification</div>
                     <a href="#" class="view-link">View All</a>
-                </div>
+                </div> -->
 
-                <div class="card">
+                <!-- <div class="card">
                     <div class="stat-title">
                         <div class="stat-icon purple">
                             <i class="fa-solid fa-file-lines"></i>
@@ -581,9 +581,9 @@
                     <div class="stat-number">8</div>
                     <div class="stat-text">Reports Submitted</div>
                     <a href="#" class="view-link">View All</a>
-                </div>
+                </div> -->
 
-                <div class="card">
+                <!-- <div class="card">
                     <div class="stat-title">
                         <div class="stat-icon yellow">
                             <i class="fa-solid fa-hourglass-half"></i>
@@ -593,7 +593,7 @@
                     <div class="stat-number">3</div>
                     <div class="stat-text">Awaiting Update</div>
                     <a href="#" class="review-link">View All</a>
-                </div>
+                </div> -->
             </div>
 
             <div class="main-grid">
