@@ -10,6 +10,9 @@ use App\Models\Estimate;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\TechnicalReport;
+use Barryvdh\DomPDF\Facade\Pdf;
+
+
 
 class EstimateController extends Controller
 {
@@ -28,10 +31,25 @@ class EstimateController extends Controller
         $rates = UnitRate::pluck('rate', 'item_key')->toArray();
 
         return view('engineer.estimates', compact('assignedRequests', 'rates'));
+       
+{
+    // 💡 estimate එක වගේම technicalReport එකත් එක පාරම ලෝඩ් කරනවා
+    $assignedRequests = ProjectRequest::with(['estimate', 'technicalReport'])
+        ->where('assigned_engineer_id', Auth::id())
+        ->where(function($query) {
+            $query->where('status', 'Assigned')
+                  ->orWhere('status', 'Approved');
+        })
+        ->get();
+
+    $rates = UnitRate::pluck('rate', 'item_key')->toArray();
+
+    return view('engineer.estimates', compact('assignedRequests', 'rates'));
+}
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created estimate in storage.
      */
     public function store(Request $request)
     {
@@ -72,10 +90,20 @@ class EstimateController extends Controller
         try {
             DB::beginTransaction();
 
-            $dataToSave = array_merge($validatedData, [
-                'engineer_id' => Auth::id(),
-                'status' => 'Pending' 
-            ]);
+            // මුළු එකතුව (Grand Total) Backend එකෙන්ම ගණනය කිරීම
+            // ... (කලින් තිබුණු කෝඩ් එක)
+$grandTotal = ($request->cement_cost ?? 0) + ($request->sand_cost ?? 0) + 
+              ($request->steel_cost ?? 0) + ($request->brick_cost ?? 0) +
+              ($request->mason_cost ?? 0) + ($request->carpenter_cost ?? 0) + 
+              ($request->helper_cost ?? 0) + ($request->mixer_cost ?? 0) + 
+              ($request->excavator_cost ?? 0) + ($request->truck_cost ?? 0);
+
+$dataToSave = array_merge($validatedData, [
+    // 💡 මෙතන තිබුණු 'status' => 'Pending' කියන පේළියත් අයින් කළා!
+    'grand_total' => $grandTotal
+]);
+
+Estimate::create($dataToSave);
 
             Estimate::create($dataToSave);
 
@@ -85,9 +113,11 @@ class EstimateController extends Controller
             
         } catch (\Exception $e) {
             DB::rollBack();
-            
-            return redirect()->back()->withErrors(['error' => 'Failed to save the estimate. Please try again.'])->withInput();
+
+            // 💡 දැනට තියෙන return redirect... පේළිය අයින් කරලා, මේ පේළිය විතරක් මෙතනට දාන්න
+            dd($e->getMessage()); 
         }
+    
     }
 
     /**
@@ -95,7 +125,7 @@ class EstimateController extends Controller
      */
     public function showReport($project_request_id = null)
     {
-        // 💡 1. දැනට ලොග් වෙලා ඉන්න Engineer ගේ ඉල්ලීම් ටික අරන් එනවා (Dropdown එකට)
+        // දැනට ලොග් වෙලා ඉන්න Engineer ගේ ඉල්ලීම් ටික අරන් එනවා (Dropdown එකට)
         $assignedRequests = ProjectRequest::with('estimate')
             ->where('assigned_engineer_id', Auth::id())
             ->get();
@@ -105,7 +135,6 @@ class EstimateController extends Controller
             $projectRequest = ProjectRequest::find($project_request_id);
         }
 
-        // View එකට assignedRequests යැවීම හරහා Dropdown එකේ රিকোවෙස්ට් populate කරගත හැක.
         return view('engineer.technical_report', compact('project_request_id', 'projectRequest', 'assignedRequests'));
     }
 
@@ -114,45 +143,99 @@ class EstimateController extends Controller
      */
     public function storeReportData(Request $request)
     {
-        // තාක්ෂණික වාර්තාවේ දත්ත සුරැකීමේ කේතය මෙහි ලියන්න
-       
-        return redirect()->back()->with('success', 'Technical Report submitted successfully!');
         $validated = $request->validate([
-        'req_id' => 'required|exists:project_requests,id',
-        'length' => 'required|numeric',
-        'width' => 'required|numeric',
-        'area' => 'required|numeric',
-        'material_cost' => 'required|numeric',
-        'labor_cost' => 'required|numeric',
-        'equipment_cost' => 'required|numeric',
-        'total_budget' => 'required|numeric',
-        'estimated_duration' => 'required|string',
-        'recommendations' => 'nullable|string',
-        'remarks' => 'nullable|string',
-    ]);
-
-    try {
-        // 2. Technical Report එකට අදාළ ඩේටාබේස් ටේබල් එකට අලුත් රෙකෝඩ් එකක් දානවා (Insert)
-        TechnicalReport::create([
-            'req_id' => $request->req_id,
-            'length' => $request->length,
-            'width' => $request->width,
-            'area' => $request->area,
-            'material_cost' => $request->material_cost,
-            'labor_cost' => $request->labor_cost,
-            'equipment_cost' => $request->equipment_cost,
-            'total_estimated_cost' => $request->total_budget, // DB col name එකට හරවගන්න
-            'estimated_duration' => $request->estimated_duration,
-            'recommendations' => $request->recommendations,
-            'remarks' => $request->remarks,
-            'prepared_by' => Auth::id(), // නැත්තම් Engineer නම
-            'date' => now()->format('Y-m-d'),
+            'req_id' => 'required|exists:project_requests,id',
+            'length' => 'required|numeric',
+            'width' => 'required|numeric',
+            'area' => 'required|numeric',
+            'material_cost' => 'required|numeric',
+            'labor_cost' => 'required|numeric',
+            'equipment_cost' => 'required|numeric',
+            'total_budget' => 'required|numeric',
+            'estimated_duration' => 'required|string',
+            'recommendations' => 'nullable|string',
+            'remarks' => 'nullable|string',
         ]);
 
-        return redirect()->back()->with('success', 'Technical Report added successfully!');
-        
-    } catch (\Exception $e) {
-        return redirect()->back()->withErrors(['error' => 'Failed to save the report. Please try again.'])->withInput();
+        try {
+            // Technical Report එකට අදාළ දත්ත ඇතුළත් කිරීම
+            TechnicalReport::create([
+                'req_id' => $request->req_id,
+                'length' => $request->length,
+                'width' => $request->width,
+                'area' => $request->area,
+                'material_cost' => $request->material_cost,
+                'labor_cost' => $request->labor_cost,
+                'equipment_cost' => $request->equipment_cost,
+                'total_estimated_cost' => $request->total_budget, 
+                'estimated_duration' => $request->estimated_duration,
+                'recommendations' => $request->recommendations,
+                'remarks' => $request->remarks,
+                'prepared_by' => Auth::id(), 
+                'date' => now()->format('Y-m-d'),
+            ]);
+
+            return redirect()->back()->with('success', 'Technical Report added successfully!');
+            
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Failed to save the report. Please try again.'])->withInput();
+        }
     }
+
+    /**
+     * Generate PDF Report for the estimate.
+     */
+    public function generateReport($requestId) 
+    {
+        // Request එක සහ Estimate එක ඩේටාබේස් එකෙන් ගැනීම
+        $projectRequest = ProjectRequest::with('estimate')->findOrFail($requestId);
+
+        if (!$projectRequest->estimate) {
+            return redirect()->back()->with('error', 'No estimate found for this request.');
+        }
+
+        // pdf/estimate_pdf.blade.php එක load කිරීම
+        $pdf = Pdf::loadView('pdf.estimate_pdf', compact('projectRequest'));
+
+        // බ්‍රවුසර් එකේම PDF එක ඕපන් කිරීම
+        return $pdf->stream('Estimate_Report_R-' . $projectRequest->id . '.pdf');
     }
+    public function generateTechnicalReportPDF($reportId)
+{
+    // Technical Report එකයි ඒකට අදාළ Project Request එකයි ඩේටාබේස් එකෙන් ගන්නවා
+    $report = TechnicalReport::with('projectRequest')->findOrFail($reportId);
+
+    // උඩ හදපු බ්ලේඩ් එක ලෝඩ් කරනවා
+    $pdf = Pdf::loadView('pdf.technical_report_pdf', compact('report'));
+
+    // බ්‍රවුසර් එකෙන්ම ඕපන් කරනවා
+    return $pdf->stream('Technical_Report_' . $report->req_id . '.pdf');
+    $report = TechnicalReport::with('projectRequest')
+        ->where('req_id', $requestId)
+        ->firstOrFail();
+
+   
+        $pdf = Pdf::loadView('pdf.technical_report_pdf', compact('report'));
 }
+public function storeTechnicalReport(Request $request)
+{
+    // 1. Validation (බ්ලේඩ් ෆෝම් එකේ නම 'measurement_details' වෙන්න ඕනේ)
+    $request->validate([
+        'req_id'              => 'required|exists:project_requests,id',
+        'measurement_details' => 'required',
+    ]);
+
+    // 2. Database එකට අලුතින්ම ඩේටා සේව් කිරීම
+    $report = new TechnicalReport();
+    $report->req_id              = $request->req_id; 
+    $report->measurement_details = $request->measurement_details; 
+    $report->total_budget        = $request->total_budget ?? 0;   
+    $report->duration            = $request->duration ?? '1 month';  
+    $report->date                = now()->toDateString();            
+    $report->save(); // 🚀 දැන් කිසිම බ්ලොක් එකක් නැතුව ඩේටාබේස් එකට කෙළින්ම සේව් වෙනවා!
+
+    return redirect()->route('engineer.dashboard')->with('success', 'Report submitted successfully!');
+
+}
+}
+

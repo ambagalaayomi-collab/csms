@@ -24,12 +24,19 @@ class ProjectRequest extends Model
 
 public function technicalReport()
 {
-    return $this->hasOne(TechnicalReport::class, 'project_request_id');
+    
+    
+     return $this->hasOne(TechnicalReport::class, 'req_id', 'id')
+        ->latestOfMany('report_id');
 }
 
 public function estimate()
 {
     return $this->hasOne(Estimate::class, 'project_request_id'); 
+     return $this->hasOne(Estimate::class);
+
 }
+
+
     
 }

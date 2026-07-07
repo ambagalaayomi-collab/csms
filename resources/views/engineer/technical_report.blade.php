@@ -217,7 +217,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('engineer.report.store') }}">
+        <form method="POST" action="{{ route('engineer.technical_report.store') }}">
             @csrf
 
             <div class="form-group" style="max-width: 400px;">

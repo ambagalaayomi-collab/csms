@@ -2,22 +2,43 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TechnicalReport extends Model
 {
-    // 💡 ඩේටාබේස් ටේබල් එකේ නම හඳුන්වා දීම
+    use HasFactory;
+
     protected $table = 'technical_reports';
 
-    // 💡 Default 'id' එක වෙනුවට 'report_id' Primary Key එක ලෙස හඳුන්වා දීම
-    protected $primaryKey = 'report_id'; 
+    protected $primaryKey = 'report_id';
 
-    // 💡 Mass Assignment එකෙන් දත්ත ආරක්ෂා කර ගැනීමට Columns හඳුන්වා දීම
     protected $fillable = [
         'req_id',
+        'length',
+        'width',
+        'area',
         'measurement_details',
+        'material_cost',
+        'labor_cost',
+        'equipment_cost',
         'total_budget',
         'duration',
-        'date'
+        'estimated_duration',
+        'recommendations',
+        'remarks',
+        'date',
     ];
+
+    protected $casts = [
+        'material_cost' => 'decimal:2',
+        'labor_cost' => 'decimal:2',
+        'equipment_cost' => 'decimal:2',
+        'total_budget' => 'decimal:2',
+    ];
+
+    public function projectRequest()
+    {
+        return $this->belongsTo(ProjectRequest::class, 'req_id', 'id');
+    }
 }

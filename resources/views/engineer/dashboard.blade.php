@@ -293,8 +293,8 @@
         /* Main layout */
         .main-grid {
             display: grid;
-            grid-template-columns: 2fr 0.9fr;
-            gap: 22px;
+            grid-template-columns: 5fr 1fr;
+    gap: 22px;
             margin-bottom: 25px;
         }
 
@@ -488,7 +488,8 @@
         <ul class="menu">
             <li><a href="#" class="active"><span><i class="fa-solid fa-house"></i></span> <text>Dashboard</text></a></li>
             <li><a href="#"><span><i class="fa-solid fa-list-check"></i></span> <text>Assigned Requests</text></a></li>
-            <!-- <li><a href="#"><span><i class="fa-solid fa-ruler-combined"></i></span> <text>Measurements</text></a></li> -->
+            
+    </a></li>
             <li>
                 <a href="{{ route('engineer.estimates') }}">
                     <span><i class="fa fa-calculator"></i></span> <text>Estimates</text>
@@ -606,6 +607,10 @@
                                 <th>Title</th>
                                 <th>Client</th>
                                 <th>Due Date</th>
+                                <th>Width</th>
+                                    <th>Height</th>
+                                    <th>Budget</th>
+                                    <th>Location</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -617,6 +622,10 @@
                                         <td>{{ $request->project_type ?? $request->title }}</td>
                                         <td>{{ $request->name ?? $request->client_name }}</td>
                                         <td>{{ $request->due_date ?? 'Not set' }}</td>
+                                        <td>{{ $request->width ?? '-' }}</td>
+                                        <td>{{ $request->height ?? '-' }}</td>
+                                        <td>LKR {{ number_format($request->budget, 2) }}</td>
+                                        <td>{{ $request->location }}</td>
                                         <td>
                                             <span class="status-badge {{ $request->status == 'Completed' ? 'status-completed' : ($request->status == 'In Progress' ? 'status-progress' : 'status-pending') }}">
                                                 {{ $request->status }}
@@ -668,7 +677,7 @@
                             </div>
 
                             <div class="form-group">
-                                <textarea name="remarks" placeholder="Add update remarks..." required></textarea>
+                                <!-- <textarea name="remarks" placeholder="Add update remarks..." required></textarea> -->
                             </div>
 
                             <button type="submit" class="submit-btn">
@@ -681,18 +690,83 @@
                 </div>
             </div>
 
-            <div class="bottom-grid">
-                <div class="card">
-                    <h3 class="card-title">Measurements Verification</h3>
-                    <div class="verification-number">14</div>
-                    <div class="verification-text">Pending Verification</div>
-                    <div class="percentage">65%</div>
-                    <div class="progress-line">
-                        <div class="progress-fill"></div>
-                    </div>
+            
+                <div class="card" style="border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-radius: 8px; background: #fff; padding: 15px;">
+    
+    <h4 style="color: #00695c; margin: 0 0 15px 0; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 5px;">
+        📊 Project Reports
+    </h4>
+
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 2px solid #e0e0e0; color: #555; font-weight: 600;">
+                    <th style="padding: 10px 12px; width: 15%;">Request ID</th>
+                    <th style="padding: 10px 12px; width: 45%;"> Client</th>
+                    <th style="padding: 10px 12px; width: 40%; text-align: right;">Status </th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($assignedRequests as $item)
+                    <tr style="border-bottom: 1px solid #f0f0f0; transition: background 0.2s;">
+                        
+                        <td style="padding: 12px; font-weight: 700; color: #111;">
+                            R-{{ $item->id }}
+                        </td>
+
+                        <td style="padding: 12px;">
+                            <span style="font-weight: 600; color: #333; display: block;">
+                                {{ Str::limit($item->project_name ?? $item->name, 25) }}
+                            </span>
+                            <!-- <small style="color: #777; font-size: 12px;">
+                                Client: {{ $item->client_name ?? 'N/A' }}
+                            </small> -->
+                        </td>
+
+                        <td style="padding: 12px; text-align: right;">
+    <div style="display: inline-flex; gap: 8px; align-items: center;">
+        
+        @if($item->estimate)
+            <a href="{{ route('engineer.estimates.report', $item->id) }}" target="_blank" title="View Estimate PDF" style="background-color: #00695c; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 12px; font-weight: 600; display: inline-block;">
+                📄 Estimate PDF
+            </a>
+        @endif
+
+   @if($item->technicalReport)
+    <a href="{{ route('view.technical_report.pdf', $item->id) }}"
+       target="_blank"
+       style="background:#1976d2;color:white;padding:6px 12px;text-decoration:none;border-radius:4px;font-size:12px;font-weight:600;">
+        📄 Technical PDF
+    </a>
+@endif
+        @if(!$item->estimate && !$item->technicalReport)
+            <span style="color: #c62828; font-size: 12px; font-weight: 700; background: #ffebee; padding: 4px 10px; border-radius: 4px; border: 1px solid #ffcdd2; display: inline-block;">
+                Pending
+            </span>
+        @endif
+
+    </div>
+</td>
+
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3" style="padding: 20px; color: #888; text-align: center; font-weight: 500;">
+                            No assigned requests found.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+</div>
+    </div>
+</div>
+</div>
                 </div>
 
-                <div class="card">
+                <!-- <div class="card">
                     <h3 class="card-title">Recent Reports</h3>
                     <ul class="report-list">
                         <li>
@@ -724,8 +798,8 @@
                     <div class="estimate-number">5</div>
                     <div class="stat-text">Estimates Prepared</div>
                     <a href="#" class="view-link">View All Estimates</a>
-                </div>
-            </div>
+                </div> -->
+            <!-- </div> -->
 
         </div>
     </main>
