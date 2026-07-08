@@ -158,39 +158,33 @@ class TechnicalReportController extends Controller
            $report->recommendations = $request->recommendations;
            $report->remarks = $request->remarks;
         
-        $report->save(); // 💾 Database එකට සුපිරියටම සේව් වුණා!
+        $report->save(); 
 
-        // 3. බ්ලේඩ් (Blade) එකට අවශ්‍ය Relationship ඩේටා ටික එකතු කරගැනීම
+        
         $report->load('projectRequest'); 
         $requestData = ProjectRequest::find($request->req_id);
 
-        // 4. PDF එක සාදා සැනින් බ්‍රවුසර් එකට Stream කිරීම
+      
         $pdf = Pdf::loadView('pdf.technical_report_pdf', compact('report', 'requestData'));
         
         return $pdf->stream('technical_report_R-' . $request->req_id . '.pdf');
     }
 
-    /**
-     * දැනටමත් සේව් කර ඇති Report එකක් Dashboard එකෙන් ක්ලික් කර නැවත PDF එක බැලීම.
-     */
-   /**
-     * දැනටමත් සේව් කර ඇති Report එකක් Dashboard එකෙන් ක්ලික් කර නැවත PDF එක බැලීම.
-     */
+    
     public function generatePDF($id)
     {
-        // 1. Request එක සහ ඒකට අදාළ technical report එක Fetch කරගැනීම
+       
         $requestData = ProjectRequest::with('technicalReport')->findOrFail($id);
 
-        // 2. Report එක වේරියබල් එකට ගැනීම
+        
         $report = $requestData->technicalReport;
 
-        // 3. Technical Report එකක් නැත්නම් ආපහු හරවා යැවීම
+        
         if (!$report) {
             return back()->with('error', 'Technical report not found for this request.');
         }
 
-        // 4. PDF එක සාදා බ්‍රවුසර් එකට Stream කිරීම (පෙන්වීම)
-        // (මෙන්න මේ line එකෙන් කෙලින්ම PDF එක load වෙන්න ඕනේ!)
+       
         $pdf = Pdf::loadView('pdf.technical_report_pdf', compact('report', 'requestData'));
         return $pdf->stream('technical_report_R-' . $id . '.pdf');
     }
