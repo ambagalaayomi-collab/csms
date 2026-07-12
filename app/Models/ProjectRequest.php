@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\TechnicalReport;
+use App\Models\Proposal;
+
 
 class ProjectRequest extends Model
 {
@@ -26,8 +29,11 @@ public function technicalReport()
 {
     
     
-     return $this->hasOne(TechnicalReport::class, 'req_id', 'id')
-        ->latestOfMany('report_id');
+     return $this->hasOne(
+        TechnicalReport::class,
+        'req_id',
+        'id'
+    )->latestOfMany('report_id');
 }
 
 public function estimate()
@@ -36,6 +42,24 @@ public function estimate()
      return $this->hasOne(Estimate::class);
 
 }
+public function proposals()
+{
+    return $this->hasMany(
+        Proposal::class,
+        'request_id',
+        'id'
+    );
+}
+
+public function latestProposal()
+{
+    return $this->hasOne(
+        Proposal::class,
+        'request_id',
+        'id'
+    )->latestOfMany();
+}
+
 
 
     

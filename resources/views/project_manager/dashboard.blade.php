@@ -92,13 +92,12 @@
             background: transparent;
             cursor: pointer;
             text-align: left;
-            font-family: inherit;
         }
 
         .menu a:hover,
         .menu a.active,
         .menu button:hover {
-            background: rgba(255,255,255,0.16);
+            background: rgba(255, 255, 255, 0.16);
         }
 
         .menu span {
@@ -210,6 +209,17 @@
             gap: 10px;
         }
 
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 13px 16px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 1px solid #fecaca;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(5, minmax(150px, 1fr));
@@ -221,7 +231,7 @@
             background: white;
             border-radius: 14px;
             padding: 16px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
             border: 1px solid #e5e7eb;
         }
 
@@ -289,6 +299,95 @@
             overflow: hidden;
         }
 
+        .request-action-panel {
+            background: #ffffff;
+            border: 1px solid #dfe5eb;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 22px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+        }
+
+        .request-action-panel h3 {
+            color: #003f35;
+            font-size: 17px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .request-action-grid {
+            display: grid;
+            grid-template-columns: 1.45fr 1.25fr 1.2fr 150px;
+            gap: 14px;
+            align-items: end;
+        }
+
+        .action-field label {
+            display: block;
+            color: #374151;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        .action-field select {
+            width: 100%;
+            height: 42px;
+            border: 1px solid #d1d5db;
+            border-radius: 9px;
+            padding: 0 11px;
+            background: white;
+            color: #111827;
+            outline: none;
+            font-size: 13px;
+        }
+
+        .action-field select:focus {
+            border-color: #047857;
+            box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.10);
+        }
+
+        .action-button-field button {
+            width: 100%;
+            height: 42px;
+            border: none;
+            border-radius: 9px;
+            background: #007a5c;
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-button-field button:hover {
+            background: #005f48;
+        }
+
+        .action-message {
+            margin-top: 12px;
+            min-height: 18px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #b45309;
+        }
+
+        .selected-request-summary {
+            display: none;
+            margin-top: 16px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            font-size: 12px;
+            color: #166534;
+        }
+
         .table-wrap {
             width: 100%;
             overflow-x: auto;
@@ -305,7 +404,8 @@
             background: #f8fafc;
         }
 
-        th, td {
+        th,
+        td {
             padding: 10px 9px;
             text-align: left;
             border-bottom: 1px solid #e5e7eb;
@@ -327,11 +427,20 @@
         th:nth-child(7), td:nth-child(7) { width: 110px; }
         th:nth-child(8), td:nth-child(8) { width: 140px; }
         th:nth-child(9), td:nth-child(9) { width: 95px; }
-        th:nth-child(10), td:nth-child(10) { width: 215px; }
+        th:nth-child(10), td:nth-child(10) { width: 110px; }
 
-        td {
-            color: #111827;
-            word-break: break-word;
+        .request-row {
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .request-row:hover {
+            background: #f8fafc;
+        }
+
+        .request-row.selected {
+            background: #ecfdf5;
+            box-shadow: inset 4px 0 0 #047857;
         }
 
         .client-info strong {
@@ -363,74 +472,6 @@
         .status-change { background: #fef3c7; color: #b45309; }
         .status-proposal { background: #e0f2fe; color: #0369a1; }
 
-        .action-box {
-            width: 195px;
-            display: grid;
-            gap: 7px;
-        }
-
-        .status-form, .assign-form {
-            display: grid;
-            gap: 6px;
-            margin: 0;
-            padding: 0;
-        }
-
-        .status-form {
-            padding-bottom: 7px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .status-form select {
-            width: 100%;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            padding: 7px;
-            font-size: 11.5px;
-            outline: none;
-            height: 34px;
-        }
-
-        .update-btn,
-        .proposal-btn,
-        .assign-btn {
-            height: 34px;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .update-btn { background: #007a5c; }
-        .update-btn:hover { background: #005f48; }
-
-        .proposal-btn { background: #003f35; }
-        .proposal-btn:hover { background: #047857; }
-
-        .assign-btn { background: #f59e0b; color: #111827; }
-        .assign-btn:hover { background: #d97706; }
-
-        .view-pdf-btn {
-            height: 32px;
-            border-radius: 8px;
-            background: #047857;
-            color: white;
-            text-decoration: none;
-            font-size: 11.5px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
         .client-response-box {
             margin-top: 7px;
             font-size: 11.5px;
@@ -453,25 +494,148 @@
             padding: 25px;
         }
 
-        /* Modal Styles */
+        .view-pdf-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: #047857;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .request-action-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            table {
+                min-width: 1000px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .dashboard {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-radius: 0;
+            }
+
+            .stats-grid,
+            .request-action-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                padding: 0 18px;
+            }
+
+            .content {
+                padding: 18px;
+            }
+
+            table {
+                min-width: 1000px;
+            }
+            .modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    width: 500px;
+    max-width: 92%;
+    border-radius: 14px;
+    padding: 25px;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.modal-content h2 {
+    margin-bottom: 18px;
+    color: #003f35;
+}
+
+.close-btn {
+    position: absolute;
+    right: 18px;
+    top: 12px;
+    font-size: 28px;
+    cursor: pointer;
+    color: #6b7280;
+}
+
+.modal-content label {
+    display: block;
+    font-weight: bold;
+    margin: 12px 0 6px;
+    color: #374151;
+}
+
+.modal-content textarea {
+    width: 100%;
+    min-height: 130px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+    padding: 11px;
+    resize: vertical;
+}
+
+.submit-proposal-btn {
+    margin-top: 18px;
+    width: 100%;
+    background: #003f35;
+    color: white;
+    border: none;
+    padding: 13px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.submit-proposal-btn:hover {
+    background: #047857;
+}
+        }
+    
         .modal {
             display: none;
             position: fixed;
-            z-index: 9999;
             inset: 0;
-            background: rgba(0,0,0,0.55);
+            z-index: 9999;
+            background: rgba(0,0,0,.55);
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
 
         .modal-content {
-            background: white;
-            width: 550px;
-            max-width: 92%;
+            background: #fff;
+            width: 500px;
+            max-width: 100%;
             border-radius: 14px;
             padding: 25px;
             position: relative;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            box-shadow: 0 20px 60px rgba(0,0,0,.25);
         }
 
         .modal-content h2 {
@@ -495,20 +659,14 @@
             color: #374151;
         }
 
-        .modal-content textarea,
-        .modal-content input {
+        .modal-content textarea {
             width: 100%;
+            min-height: 130px;
             border: 1px solid #d1d5db;
             border-radius: 8px;
             outline: none;
             font-size: 14px;
             padding: 11px;
-            margin-top: 4px;
-            margin-bottom: 10px;
-        }
-
-        .modal-content textarea {
-            min-height: 120px;
             resize: vertical;
         }
 
@@ -516,7 +674,7 @@
             margin-top: 18px;
             width: 100%;
             background: #003f35;
-            color: white;
+            color: #fff;
             border: none;
             padding: 13px;
             border-radius: 8px;
@@ -528,47 +686,10 @@
             background: #047857;
         }
 
-        /* Responsive Breakpoints */
-        @media (max-width: 1200px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            table {
-                min-width: 1250px;
-            }
-        }
-
-        @media (max-width: 900px) {
-            .dashboard {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                border-radius: 0;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .topbar {
-                padding: 0 18px;
-            }
-
-            .content {
-                padding: 18px;
-            }
-
-            table {
-                min-width: 1250px;
-            }
-        }
     </style>
 </head>
-<body>
 
+<body>
 <div class="dashboard">
 
     <aside class="sidebar">
@@ -601,7 +722,7 @@
             </li>
 
             <li>
-                <a href="#clientRequests">
+                <a href="#requestActions">
                     <span><i class="fa-solid fa-file-signature"></i></span>
                     Proposals
                 </a>
@@ -620,7 +741,6 @@
     </aside>
 
     <main class="main">
-
         <div class="topbar">
             <h1>Project Manager Dashboard</h1>
 
@@ -638,6 +758,7 @@
                     <div class="avatar">
                         <i class="fa-solid fa-user-tie"></i>
                     </div>
+
                     <div class="user-info">
                         <h4>{{ Auth::user()->name ?? 'Project Manager' }}</h4>
                         <p>Project Manager</p>
@@ -669,15 +790,20 @@
                 </div>
             @endif
 
-            @if(session('assign_success'))
+            @if(session('assign_success') || session('success'))
                 <div class="success-message">
                     <i class="fa-solid fa-circle-check"></i>
-                    {{ session('assign_success') }}
+                    {{ session('assign_success') ?? session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="error-message">
+                    {{ session('error') }}
                 </div>
             @endif
 
             <div class="stats-grid">
-
                 <div class="card">
                     <div class="stat-title">
                         <div class="stat-icon green">
@@ -735,14 +861,110 @@
                     </div>
                     <div class="stat-number">{{ $proposalCount ?? 0 }}</div>
                     <div class="stat-text">PDF proposals sent</div>
-                    <a href="#clientRequests" class="view-link">Create Proposal</a>
+                    <a href="#requestActions" class="view-link">Manage Proposals</a>
                 </div>
-
             </div>
 
             <div class="main-grid">
                 <div class="card" id="clientRequests">
-                    <h3 class="card-title">Client Request Notifications & Proposal Management</h3>
+                    <h3 class="card-title">
+                        Client Request Notifications & Proposal Management
+                    </h3>
+
+                    <div class="request-action-panel" id="requestActions">
+                        <h3>
+                            <i class="fa-solid fa-gear"></i>
+                            Request Actions
+                        </h3>
+
+                        <div class="request-action-grid">
+                            <div class="action-field">
+                                <label for="selected_request">Request</label>
+
+                             <select id="selected_request">
+    <option value="">Select Request</option>
+
+    @foreach($clientRequests as $item)
+
+        @if($item->technicalReport)
+
+            @php
+                $itemProposal = ($proposals ?? collect())
+                    ->where('project_request_id', $item->id)
+                    ->sortByDesc('created_at')
+                    ->first();
+            @endphp
+
+            <option
+    value="{{ $item->id }}"
+    data-status="{{ $item->status }}"
+    data-name="{{ $item->name }}"
+    data-project="{{ $item->project_type }}"
+    data-location="{{ $item->location }}"
+    data-has-proposal="{{ $itemProposal ? '1' : '0' }}"
+    data-proposal-id="{{ $itemProposal ? $itemProposal->id : '' }}"
+    data-proposal-sent="{{ $itemProposal && $itemProposal->status === 'Sent' ? '1' : '0' }}"
+    data-pdf-url="{{ $itemProposal
+        ? route('proposal.pdf', $itemProposal->id)
+        : '' }}"
+>
+    R-{{ str_pad($item->id, 4, '0', STR_PAD_LEFT) }}
+    - {{ $item->name }}
+</option>
+
+        @endif
+
+    @endforeach
+</select>
+                            </div>
+
+                            <div class="action-field">
+                                <label for="selected_action">Action</label>
+
+                                <select id="selected_action">
+                                    <option value="">Select Action</option>
+                                    <option value="view_pdf">View Proposal PDF</option>
+                                    <option value="create_proposal">Create Proposal</option>
+                                    <option value="send_client">Send To Client</option>
+                                    <option value="update_status">Update Status</option>
+                                    
+                                </select>
+                            </div>
+
+                            <div class="action-field" id="statusField" style="display:none;">
+                                <label for="selected_status">Status</label>
+
+                                <select id="selected_status">
+                                    <option value="Pending">Pending</option>
+                                    <option value="In Review">In Review</option>
+                                    <option value="Proposal Sent">Proposal Sent</option>
+                                    <option value="Approved">Approved</option>
+                                    <option value="Rejected">Rejected</option>
+                                    <option value="Changes Requested">Changes Requested</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                            </div>
+
+                            <div class="action-button-field">
+                                <button type="button" id="applyActionBtn">
+                                    <i class="fa-solid fa-play"></i>
+                                    Apply
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="selected-request-summary" id="selectedRequestSummary"></div>
+                        <p id="actionMessage" class="action-message"></p>
+                    </div>
+
+                    <form method="POST" id="hiddenStatusForm" style="display:none;">
+                        @csrf
+                        <input type="hidden" name="status" id="hiddenStatusInput">
+                    </form>
+
+                    <form method="POST" id="hiddenEngineerForm" style="display:none;">
+                        @csrf
+                    </form>
 
                     <div class="table-wrap">
                         <table>
@@ -758,6 +980,7 @@
                                     <th>Status</th>
                                     <th>Submitted</th>
                                     <th>Action</th>
+                                    
                                 </tr>
                             </thead>
 
@@ -770,8 +993,13 @@
                                             ->first();
                                     @endphp
 
-                                    <tr>
-                                        <td>R-{{ str_pad($request->id, 4, '0', STR_PAD_LEFT) }}</td>
+                                    <tr class="request-row"
+                                        data-request-id="{{ $request->id }}"
+                                        onclick="selectRequestFromRow('{{ $request->id }}')">
+
+                                        <td>
+                                            R-{{ str_pad($request->id, 4, '0', STR_PAD_LEFT) }}
+                                        </td>
 
                                         <td class="client-info">
                                             <strong>{{ $request->name }}</strong>
@@ -799,7 +1027,9 @@
                                             @elseif($request->status === 'Proposal Sent')
                                                 <span class="status status-proposal">Proposal Sent</span>
                                             @else
-                                                <span class="status status-pending">{{ $request->status }}</span>
+                                                <span class="status status-pending">
+                                                    {{ $request->status }}
+                                                </span>
                                             @endif
 
                                             @if($latestProposal)
@@ -809,7 +1039,9 @@
 
                                                     @if($latestProposal->response_comment)
                                                         <br>
-                                                        <small>{{ $latestProposal->response_comment }}</small>
+                                                        <small>
+                                                            {{ $latestProposal->response_comment }}
+                                                        </small>
                                                     @endif
                                                 </div>
                                             @endif
@@ -819,120 +1051,281 @@
                                             {{ $request->created_at ? $request->created_at->diffForHumans() : '-' }}
                                         </td>
 
-                                        <td>
-                                            <div class="action-box">
-                                                <form method="POST" action="{{ route('project.request.status.update', $request->id) }}" class="status-form">
-                                                    @csrf
-                                                    <select name="status" required>
-                                                        <option value="Pending" {{ $request->status === 'Pending' ? 'selected' : '' }}>Pending</option>
-                                                        <option value="In Review" {{ $request->status === 'In Review' ? 'selected' : '' }}>In Review</option>
-                                                        <option value="Proposal Sent" {{ $request->status === 'Proposal Sent' ? 'selected' : '' }}>Proposal Sent</option>
-                                                    </select>
-                                                    <button type="submit" class="update-btn">Update Status</button>
-                                                </form>
+                                       <td>
+    {{-- 1. දැනටමත් Technical Report එකක් තියෙනවා නම් --}}
+    @if($request->technicalReport)
+        
+        {{-- Proposal එකක් සහ PDF එකක් තියෙනවා නම් View PDF බටන් එක පෙන්වන්න --}}
+        @if($latestProposal && !empty($latestProposal->pdf_path))
+            <a href="{{ route('proposal.pdf', $latestProposal->id) }}"
+               target="_blank"
+               class="view-pdf-btn">
+                <i class="fa-solid fa-file-pdf"></i>
+                View PDF
+            </a>
+        @else
+            {{-- Technical Report එක තිබුණත් තවම Proposal PDF එකක් හදලා නැත්නම් --}}
+            <span style="color:#9ca3af; font-size:12px; font-weight:bold; display:block;">
+                No Proposal PDF
+            </span>
+        @endif
 
-                                                <form action="{{ route('manager.requests.assign', $request->id) }}" method="POST" class="assign-form">
-                                                    @csrf
-                                                    <button type="submit" class="assign-btn">
-                                                        <i class="fa-solid fa-paper-plane"></i> Send To Engineer
-                                                    </button>
-                                                </form>
+    {{-- 2. Technical Report එකක් නැති අලුත්ම Request එකක් නම් --}}
+    @else
+        <div style="margin-bottom: 5px;">
+            <span style="color:#dc2626; font-size:12px; font-weight:bold;">
+                Technical Report Not Available
+            </span>
+        </div>
 
-                                                @if($latestProposal && $latestProposal->pdf_path)
-                                                    <a href="{{ asset('storage/' . $latestProposal->pdf_path) }}" target="_blank" class="view-pdf-btn">
-                                                        <i class="fa-solid fa-file-pdf"></i> View PDF
-                                                    </a>
-                                                @endif
+        {{-- 🔄 මෙතනදී තමයි දැනටමත් Send කරලද නැද්ද කියලා බලන්නේ --}}
+        @if($request->status == 'Assigned')
+            <span style="background-color: #def7ec; color: #03543f; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block;">
+                <i class="fa-solid fa-circle-check"></i> Sent to Engineer
+            </span>
+        @else
+            <form action="{{ route('manager.requests.assign', $request->id) }}" method="POST" style="margin-top: 5px;">
+                @csrf
+                <button type="submit" class="assign-btn" style="background-color: #2563eb; color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    Send To Engineer
+                </button>
+            </form>
+        @endif
 
-                                                <button type="button" class="proposal-btn" onclick="openProposalModal('{{ $request->id }}')">
-                                                    Create Proposal
-                                                </button>
-                                            </div>
-                                        </td>
-                                        
+    @endif
+</td>
                                     </tr>
                                 @empty
                                     <tr>
                                         <td colspan="10" class="empty-row">
-                                            No client requests received yet.
+                                            No request notifications found.
                                         </td>
                                     </tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
-
-                    <div class="table-footer">
-                        <a href="#clientRequests">Latest requests are shown first</a>
-                    </div>
                 </div>
             </div>
-
         </div>
+        
 
-        <div id="proposalModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn" onclick="closeProposalModal()">&times;</span>
-
-                <h2>Create Proposal</h2>
-
-                <form method="POST" id="proposalForm">
-                    @csrf
-
-                    <label for="proposal_details">Terms & Conditions</label>
-                    <textarea
-                        id="proposal_details"
-                        name="proposal_details"
-                        placeholder="Enter proposal details"
-                        required></textarea>
-
-                    <label for="total_budget">Total Budget</label>
-                    <input
-                        id="total_budget"
-                        type="number"
-                        name="total_budget"
-                        placeholder="Enter total budget"
-                        required>
-
-                    <label for="estimated_duration">Estimated Duration</label>
-                    <input
-                        id="estimated_duration"
-                        type="text"
-                        name="estimated_duration"
-                        placeholder="Estimated duration (e.g. 6 Months)"
-                        required>
-
-                    <button type="submit" class="submit-proposal-btn">
-                        Create PDF
-                    </button>
-                </form>
-            </div>
-        </div>
+</div>
     </main>
+    
+</div>
 
+<div id="proposalModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeProposalModal()">&times;</span>
+
+        <h2>Create Proposal</h2>
+
+        <form method="POST" id="proposalForm">
+            @csrf
+
+            <label for="proposal_details">Terms & Conditions</label>
+
+            <textarea
+                name="proposal_details"
+                id="proposal_details"
+                placeholder="Enter proposal terms and conditions"
+                required></textarea>
+
+            <button type="submit" class="submit-proposal-btn">
+                <i class="fa-solid fa-file-pdf"></i>
+                Create PDF
+            </button>
+        </form>
+    </div>
 </div>
 
 <script>
-function openProposalModal(requestId) {
-    const modal = document.getElementById('proposalModal');
-    const form = document.getElementById('proposalForm');
+document.addEventListener('DOMContentLoaded', function () {
+    const requestSelect = document.getElementById('selected_request');
+    const actionSelect = document.getElementById('selected_action');
+    const statusField = document.getElementById('statusField');
+    const statusSelect = document.getElementById('selected_status');
+    const applyBtn = document.getElementById('applyActionBtn');
+    const message = document.getElementById('actionMessage');
 
-    form.action = '/project-request/' + requestId + '/proposal';
-    modal.style.display = 'flex';
-}
-
-function closeProposalModal() {
-    document.getElementById('proposalModal').style.display = 'none';
-}
-
-window.onclick = function(event) {
-    const modal = document.getElementById('proposalModal');
-
-    if (event.target === modal) {
-        closeProposalModal();
+    function selectedOption() {
+        return requestSelect.options[requestSelect.selectedIndex];
     }
-}
-</script>
 
+    function refreshActionState() {
+        const option = selectedOption();
+        const createOption = actionSelect.querySelector(
+            'option[value="create_proposal"]'
+        );
+
+        message.textContent = '';
+
+        if (!option || !option.value) {
+            createOption.disabled = false;
+            createOption.textContent = 'Create Proposal';
+            return;
+        }
+
+        if (option.dataset.status) {
+            statusSelect.value = option.dataset.status;
+        }
+
+        if (option.dataset.hasProposal === '1') {
+            createOption.disabled = true;
+            createOption.textContent = 'Proposal Already Created';
+
+            if (actionSelect.value === 'create_proposal') {
+                actionSelect.value = '';
+            }
+        } else {
+            createOption.disabled = false;
+            createOption.textContent = 'Create Proposal';
+        }
+    }
+
+    requestSelect.addEventListener('change', refreshActionState);
+
+    actionSelect.addEventListener('change', function () {
+        statusField.style.display =
+            this.value === 'update_status' ? 'block' : 'none';
+
+        message.textContent = '';
+    });
+
+    applyBtn.addEventListener('click', function () {
+        const option = selectedOption();
+
+        if (!option || !option.value) {
+            message.textContent = 'Please select a request.';
+            return;
+        }
+
+        const requestId = option.value;
+        const action = actionSelect.value;
+
+        if (!action) {
+            message.textContent = 'Please select an action.';
+            return;
+        }
+
+        // 1. View PDF Action
+        if (action === 'view_pdf') {
+            const pdfUrl = option.dataset.pdfUrl;
+
+            if (!pdfUrl) {
+                message.textContent = 'Proposal PDF is not available for this request.';
+                return;
+            }
+
+            window.open(pdfUrl, '_blank');
+            return;
+        }
+
+        // 2. Create Proposal Action
+        if (action === 'create_proposal') {
+            if (option.dataset.hasProposal === '1') {
+                message.textContent = 'A proposal has already been created for this request.';
+                return;
+            }
+
+            openProposalModal(requestId);
+            return;
+        }
+
+        // 3. Send to Client Action (Form Submit ක්‍රමයට නිවැරදි කර ඇත)
+        if (action === 'send_client') {
+    if (option.dataset.hasProposal !== '1') {
+        message.textContent =
+            'Please create a proposal before sending it to the client.';
+        return;
+    }
+
+    if (option.dataset.proposalSent === '1') {
+        message.textContent =
+            'This proposal has already been sent to the client.';
+        return;
+    }
+
+    const proposalId = option.dataset.proposalId;
+
+    if (!proposalId) {
+        message.textContent = 'Proposal ID is not available.';
+        return;
+    }
+
+    const confirmed = confirm(
+        'Are you sure you want to send this proposal to the client?'
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    const form = document.getElementById('hiddenStatusForm');
+
+    form.action =
+        '/manager/proposal/' + proposalId + '/send-client';
+
+    form.submit();
+    return;
+}
+
+        // 4. Update Status Action
+        if (action === 'update_status') {
+            const form = document.getElementById('hiddenStatusForm');
+
+            document.getElementById('hiddenStatusInput').value = statusSelect.value;
+
+            form.action = '/project-request/' + requestId + '/status';
+            form.submit();
+        }
+    });
+
+    window.selectRequestFromRow = function (id) {
+        requestSelect.value = String(id);
+        requestSelect.dispatchEvent(new Event('change'));
+
+        document.querySelectorAll('.request-row').forEach(function (row) {
+            row.classList.remove('selected');
+        });
+
+        const row = document.querySelector(
+            '.request-row[data-request-id="' + id + '"]'
+        );
+
+        if (row) {
+            row.classList.add('selected');
+        }
+    };
+
+    window.openProposalModal = function (requestId) {
+        const modal = document.getElementById('proposalModal');
+        const form = document.getElementById('proposalForm');
+
+        form.action = '/project-request/' + requestId + '/proposal';
+        modal.style.display = 'flex';
+
+        document.getElementById('proposal_details').focus();
+    };
+
+    window.closeProposalModal = function () {
+        document.getElementById('proposalModal').style.display = 'none';
+    };
+
+    window.addEventListener('click', function (event) {
+        const modal = document.getElementById('proposalModal');
+
+        if (event.target === modal) {
+            closeProposalModal();
+        }
+        
+    });
+
+
+    refreshActionState();
+});
+</script>
 </body>
 </html>

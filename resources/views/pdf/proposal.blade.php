@@ -1,15 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Project Proposal</title>
 
     <style>
+        @page {
+            margin: 28px 32px 45px 32px;
+        }
+
         body {
             font-family: DejaVu Sans, sans-serif;
             color: #111827;
-            font-size: 13px;
-            line-height: 1.6;
+            font-size: 12px;
+            line-height: 1.45;
+            margin: 0;
         }
 
         .header {
@@ -22,35 +27,39 @@
 
         .header h1 {
             margin: 0;
-            font-size: 23px;
+            font-size: 22px;
         }
 
         .header p {
             margin: 5px 0 0;
             font-size: 13px;
+            letter-spacing: 1px;
         }
 
         .section {
-            margin-top: 22px;
+            margin-top: 18px;
+            page-break-inside: avoid;
         }
 
         .section h2 {
-            font-size: 17px;
+            font-size: 16px;
             color: #003f35;
             border-bottom: 2px solid #047857;
-            padding-bottom: 6px;
-            margin-bottom: 12px;
+            padding-bottom: 5px;
+            margin: 0 0 10px 0;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 8px;
+            margin-top: 6px;
+            page-break-inside: avoid;
         }
 
-        td, th {
+        td,
+        th {
             border: 1px solid #d1d5db;
-            padding: 9px;
+            padding: 8px;
             text-align: left;
             vertical-align: top;
         }
@@ -59,12 +68,31 @@
             background: #ecfdf5;
             color: #003f35;
             width: 35%;
+            font-weight: bold;
+        }
+
+        .scope-table th:first-child,
+        .scope-table td:first-child {
+            width: 18%;
+            text-align: center;
+        }
+
+        .scope-table th:last-child,
+        .scope-table td:last-child {
+            width: 82%;
         }
 
         .amount {
-            font-size: 18px;
+            text-align: right;
             font-weight: bold;
-            color: #047857;
+        }
+
+        .total-row th,
+        .total-row td {
+            background: #ecfdf5;
+            color: #003f35;
+            font-size: 14px;
+            font-weight: bold;
         }
 
         .details-box {
@@ -72,187 +100,326 @@
             padding: 12px;
             border-radius: 6px;
             background: #f9fafb;
-            white-space: pre-line;
+        }
+
+        .terms-list {
+            margin: 8px 0 0 18px;
+            padding: 0;
+        }
+
+        .terms-list li {
+            margin-bottom: 6px;
+        }
+
+        .signature-line {
+            display: inline-block;
+            width: 220px;
+            border-bottom: 1px solid #111827;
+            height: 18px;
+        }
+
+        .prepared-box {
+            border: 1px solid #d1d5db;
+            padding: 14px;
+            background: #f9fafb;
+        }
+
+        .prepared-box p {
+            margin: 5px 0;
         }
 
         .footer {
-            margin-top: 35px;
-            font-size: 12px;
+            margin-top: 28px;
+            padding-top: 10px;
+            border-top: 1px solid #d1d5db;
             color: #6b7280;
             text-align: center;
+            font-size: 10px;
+        }
+
+        .footer strong {
+            color: #003f35;
         }
     </style>
 </head>
+
 <body>
 
-<div class="header">
-    <h1>CONSTRUCTION SITE MANAGEMENT SYSTEM</h1>
-    <p>PROJECT PROPOSAL</p>
-</div>
-
-<div class="section">
-    <table>
-        <tr>
-            <th>Proposal No</th>
-            <td>P-{{ str_pad($proposal->id, 4, '0', STR_PAD_LEFT) }}</td>
-        </tr>
-        <tr>
-            <th>Date</th>
-            <td>{{ $proposal->created_at->format('d M Y') }}</td>
-        </tr>
-    </table>
-</div>
-
-<div class="section">
-    <h2>Client Information</h2>
-
-    <table>
-        <tr>
-            <th>Name</th>
-            <td>{{ $projectRequest->name }}</td>
-        </tr>
-
-        <tr>
-            <th>Phone</th>
-            <td>{{ $projectRequest->phone }}</td>
-        </tr>
-
-        <tr>
-            <th>Email</th>
-            <td>{{ $projectRequest->email }}</td>
-        </tr>
-    </table>
-</div>
-
-<div class="section">
-    <h2>Project Summary</h2>
-
-    <table>
-        <tr>
-            <th>Project Type</th>
-            <td>{{ $projectRequest->project_type }}</td>
-        </tr>
-
-        <tr>
-            <th>Location</th>
-            <td>{{ $projectRequest->location }}</td>
-        </tr>
-
-        <tr>
-            <th>Dimensions</th>
-            <td>{{ $projectRequest->width }}m × {{ $projectRequest->height }}m</td>
-        </tr>
-
-        <tr>
-            <th>Client Expected Budget</th>
-            <td>LKR {{ number_format($projectRequest->budget, 2) }}</td>
-        </tr>
-
-        <tr>
-            <th>Client Expected Timeline</th>
-            <td>{{ $projectRequest->timeline }}</td>
-        </tr>
-
-        <tr>
-            <th>Client Requirements</th>
-            <td>{{ $projectRequest->requirements }}</td>
-        </tr>
-    </table>
-</div>
-
-<div class="section">
-    <h2>Scope of Work</h2>
-
-    <div class="details-box">
-- Site preparation
-- Foundation construction
-- Structural work
-- Finishing
+    <div class="header">
+        <h1>CONSTRUCTION SITE MANAGEMENT SYSTEM</h1>
+        <p>PROJECT PROPOSAL</p>
     </div>
-</div>
 
-<div class="section">
-    <h2>Cost Breakdown</h2>
+    <div class="section">
+        <h2>Proposal Details</h2>
 
-    <table>
-        <!-- <tr>
-            <th>Labor Cost</th>
-            <td>LKR __________________</td>
-        </tr>
+        <table>
+            <tr>
+                <th>Proposal Number</th>
+                <td>
+                    P-{{ str_pad($proposal->id, 4, '0', STR_PAD_LEFT) }}
+                </td>
+            </tr>
 
-        <tr>
-            <th>Material Cost</th>
-            <td>LKR __________________</td>
-        </tr>
+            <tr>
+                <th>Project Request ID</th>
+                <td>
+                    R-{{ str_pad($projectRequest->id, 4, '0', STR_PAD_LEFT) }}
+                </td>
+            </tr>
 
-        <tr>
-            <th>Equipment Cost</th>
-            <td>LKR __________________</td>
-        </tr> -->
-
-        <tr>
-            <th>Total Estimated Cost</th>
-            <td class="amount">
-                LKR {{ number_format($proposal->total_budget, 2) }}
-            </td>
-        </tr>
-    </table>
-</div>
-
-<div class="section">
-    <h2>Project Timeline</h2>
-
-    <table>
-        <tr>
-            <th>Estimated Duration</th>
-            <td>{{ $proposal->estimated_duration }}</td>
-        </tr>
-    </table>
-</div>
-
-<div class="section">
-    <h2>Terms & Conditions</h2>
-
-    <div class="details-box">
-{{ $proposal->proposal_details }}
+            <tr>
+                <th>Issue Date</th>
+                <td>
+                    {{ $proposal->created_at->format('d M Y') }}
+                </td>
+            </tr>
+        </table>
     </div>
-</div>
 
-<div class="section">
-    <h2>Prepared By</h2>
+    <div class="section">
+        <h2>Client Information</h2>
 
-    <table>
-        <tr>
-            <th>Project Manager Name</th>
-            <td>{{ $manager->name }}</td>
-        </tr>
-    </table>
-</div>
+        <table>
+            <tr>
+                <th>Client Name</th>
+                <td>{{ $projectRequest->name }}</td>
+            </tr>
 
-<div class="section">
-    <h2>Client Approval</h2>
+            <tr>
+                <th>Phone Number</th>
+                <td>{{ $projectRequest->phone }}</td>
+            </tr>
 
-    <table>
-        <tr>
-            <th>Status</th>
-            <td>{{ $proposal->status }}</td>
-        </tr>
+            <tr>
+                <th>Email Address</th>
+                <td>{{ $projectRequest->email }}</td>
+            </tr>
+        </table>
+    </div>
 
-        <tr>
-            <th>Client Comment</th>
-            <td>{{ $proposal->response_comment ?? 'No response yet' }}</td>
-        </tr>
+    <div class="section">
+        <h2>Project Summary</h2>
 
-        <tr>
-            <th>Signature</th>
-            <td style="height:50px;"></td>
-        </tr>
-    </table>
-</div>
+        <table>
+            <tr>
+                <th>Project Type</th>
+                <td>{{ $projectRequest->project_type }}</td>
+            </tr>
 
-<div class="footer">
-    This proposal PDF was generated by the Construction Site Management System.
-</div>
+            <tr>
+                <th>Project Location</th>
+                <td>{{ $projectRequest->location }}</td>
+            </tr>
+
+            <tr>
+                <th>Road Length</th>
+                <td>{{ $projectRequest->width }} m</td>
+            </tr>
+
+            <tr>
+                <th>Road Width</th>
+                <td>{{ $projectRequest->height }} m</td>
+            </tr>
+
+            <tr>
+                <th>Estimated Duration</th>
+                <td>
+                    {{ $technicalReport->estimated_duration
+                        ?? $technicalReport->duration
+                        ?? $proposal->estimated_duration
+                        ?? 'Not specified' }}
+                </td>
+            </tr>
+
+            <tr>
+                <th>Client Expected Budget</th>
+                <td>
+                    LKR {{ number_format($projectRequest->budget ?? 0, 2) }}
+                </td>
+            </tr>
+
+            <tr>
+                <th>Client Requirements</th>
+                <td>
+                    {{ $projectRequest->requirements ?? 'No special requirements provided.' }}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Scope of Work</h2>
+
+        <table class="scope-table">
+            <tr>
+                <th>Phase</th>
+                <th>Description</th>
+            </tr>
+
+            <tr>
+                <td>01</td>
+                <td>Site Preparation</td>
+            </tr>
+
+            <tr>
+                <td>02</td>
+                <td>Earth Work</td>
+            </tr>
+
+            <tr>
+                <td>03</td>
+                <td>Base Construction</td>
+            </tr>
+
+            <tr>
+                <td>04</td>
+                <td>Concrete / Asphalt Paving</td>
+            </tr>
+
+            <tr>
+                <td>05</td>
+                <td>Drainage Construction</td>
+            </tr>
+
+            <tr>
+                <td>06</td>
+                <td>Finishing and Road Marking</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Cost Breakdown</h2>
+
+        <table>
+            <tr>
+                <th>Labor Cost</th>
+                <td class="amount">
+                    LKR {{ number_format($technicalReport->labor_cost ?? 0, 2) }}
+                </td>
+            </tr>
+
+            <tr>
+                <th>Material Cost</th>
+                <td class="amount">
+                    LKR {{ number_format($technicalReport->material_cost ?? 0, 2) }}
+                </td>
+            </tr>
+
+            <tr>
+                <th>Equipment Cost</th>
+                <td class="amount">
+                    LKR {{ number_format($technicalReport->equipment_cost ?? 0, 2) }}
+                </td>
+            </tr>
+
+            <tr>
+                <th>Subtotal</th>
+                <td class="amount">
+                    LKR {{ number_format(
+                        ($technicalReport->labor_cost ?? 0)
+                        + ($technicalReport->material_cost ?? 0)
+                        + ($technicalReport->equipment_cost ?? 0),
+                        2
+                    ) }}
+                </td>
+            </tr>
+
+            <tr class="total-row">
+                <th>Total Estimated Cost</th>
+                <td class="amount">
+                    LKR {{ number_format(
+                        $technicalReport->total_budget
+                            ?? $proposal->total_budget
+                            ?? 0,
+                        2
+                    ) }}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Terms & Conditions</h2>
+
+        <div class="details-box">
+            @if(!empty($proposal->proposal_details))
+                <p>{{ $proposal->proposal_details }}</p>
+            @endif
+
+            <ol class="terms-list">
+                <li>This proposal is valid for 30 days from the issue date.</li>
+                <li>Payment shall be made according to agreed project milestones.</li>
+                <li>Construction work will commence after written client approval.</li>
+                <li>Material price variations may affect the final project cost.</li>
+                <li>Project completion may be affected by weather and unforeseen site conditions.</li>
+                <li>Additional work requested by the client may incur additional charges.</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Prepared By</h2>
+
+        <div class="prepared-box">
+            <p>
+                <strong>Project Manager:</strong>
+                {{ $manager->name ?? 'Project Manager' }}
+            </p>
+
+            <p>
+                <strong>Designation:</strong>
+                Project Manager
+            </p>
+
+            <p>
+                <strong>Organization:</strong>
+                Construction Site Management System
+            </p>
+
+            <p style="margin-top: 22px;">
+                <strong>Signature:</strong>
+                <span class="signature-line"></span>
+            </p>
+
+            <p style="margin-top: 12px;">
+                <strong>Date:</strong>
+                {{ $proposal->created_at->format('d M Y') }}
+            </p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Client Acceptance</h2>
+
+        <div class="details-box">
+            <p>
+                I hereby confirm that I have reviewed and accept this project proposal.
+            </p>
+
+            <p style="margin-top: 20px;">
+                <strong>Client Name:</strong>
+                <span class="signature-line"></span>
+            </p>
+
+            <p style="margin-top: 14px;">
+                <strong>Signature:</strong>
+                <span class="signature-line"></span>
+            </p>
+
+            <p style="margin-top: 14px;">
+                <strong>Date:</strong>
+                <span class="signature-line"></span>
+            </p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <strong>Generated by Construction Site Management System</strong><br>
+        Department of Information Technology<br>
+        Project Proposal Document
+    </div>
 
 </body>
 </html>

@@ -652,9 +652,14 @@
 
             <div class="top-right">
                 <div class="icon-btn">
-                    <i class="fa-solid fa-bell"></i>
-                    <span class="badge">{{ ($pendingRequests ?? 0) + ($proposalCount ?? 0) }}</span>
-                </div>
+    <i class="fa-solid fa-bell"></i>
+
+    @if($notificationCount > 0)
+        <span class="badge">
+            {{ $notificationCount }}
+        </span>
+    @endif
+</div>
 
                 <div class="icon-btn">
                     <i class="fa-solid fa-circle-question"></i>
@@ -975,6 +980,7 @@
                         @endforelse
                     </tbody>
                 </table>
+                
             </div>
 
         </div>
