@@ -112,35 +112,42 @@ class ProposalController extends Controller
     /**
      * ⚡ නිවැරදි කරන ලද Send To Client Method එක
      */
-    public function sendToClient($id)
+   public function sendToClient($id)
 {
     try {
+        // Route එකෙන් එන්නේ Proposal ID එක
         $proposal = Proposal::findOrFail($id);
 
         DB::transaction(function () use ($proposal) {
+
+            // Proposal status update
             $proposal->status = 'Sent';
             $proposal->save();
 
-            ProjectRequest::where(
-                'id',
+            // අදාළ Project Request status update
+            $projectRequest = ProjectRequest::findOrFail(
                 $proposal->project_request_id
-            )->update([
-                'status' => 'Proposal Sent',
-            ]);
+            );
+
+            $projectRequest->status = 'Proposal Sent';
+            $projectRequest->save();
         });
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Proposal sent to client successfully.',
-        ]);
+        return redirect()
+            ->route('project.manager.dashboard')
+            ->with(
+                'success',
+                'Proposal sent to client successfully.'
+            );
 
     } catch (\Throwable $exception) {
         report($exception);
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Unable to send the proposal.',
-        ], 500);
+        return back()->with(
+            'error',
+            'Unable to send the proposal. Error: ' .
+            $exception->getMessage()
+        );
     }
 }
 }

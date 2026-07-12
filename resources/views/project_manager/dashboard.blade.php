@@ -1055,14 +1055,34 @@
     {{-- 1. දැනටමත් Technical Report එකක් තියෙනවා නම් --}}
     @if($request->technicalReport)
         
-        {{-- Proposal එකක් සහ PDF එකක් තියෙනවා නම් View PDF බටන් එක පෙන්වන්න --}}
         @if($latestProposal && !empty($latestProposal->pdf_path))
-            <a href="{{ route('proposal.pdf', $latestProposal->id) }}"
-               target="_blank"
-               class="view-pdf-btn">
-                <i class="fa-solid fa-file-pdf"></i>
-                View PDF
-            </a>
+
+    @if($latestProposal->status === 'Sent')
+
+        <span style="
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            padding:7px 12px;
+            background:#e0f2fe;
+            color:#0369a1;
+            border-radius:8px;
+            font-size:12px;
+            font-weight:bold;
+        ">
+            <i class="fa-solid fa-circle-check"></i>
+            Proposal Sent
+        </span>
+
+    @else
+
+        <a href="{{ route('proposal.pdf', $latestProposal->id) }}"
+           target="_blank"
+           class="view-pdf-btn">
+            <i class="fa-solid fa-file-pdf"></i>
+            View PDF
+        </a>
+         @endif
         @else
             {{-- Technical Report එක තිබුණත් තවම Proposal PDF එකක් හදලා නැත්නම් --}}
             <span style="color:#9ca3af; font-size:12px; font-weight:bold; display:block;">
@@ -1086,7 +1106,7 @@
         @else
             <form action="{{ route('manager.requests.assign', $request->id) }}" method="POST" style="margin-top: 5px;">
                 @csrf
-                <button type="submit" class="assign-btn" style="background-color: #2563eb; color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                <button type="submit" class="assign-btn" style="background-color: #e8940e; color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">
                     <i class="fa-solid fa-paper-plane"></i>
                     Send To Engineer
                 </button>

@@ -162,7 +162,7 @@ Route::group(['middleware' => ['auth']], function () {
     $myProposals = Proposal::whereHas('projectRequest', function ($query) use ($clientId) {
             $query->where('client_id', $clientId);
         })
-        ->where('status', 'Sent')
+        // ->where('status', 'Sent')
         ->whereNotNull('pdf_path')
         ->latest()
         ->get();
@@ -211,22 +211,42 @@ Route::post('/proposal/{id}/respond', function (
             $validated['response_comment'] ?? null,
     ]);
 
-    $projectRequest = ProjectRequest::find(
-        $proposal->project_request_id
+   $projectRequest = ProjectRequest::findOrFail(
+    $proposal->project_request_id
+);
+
+$projectRequest->status = $validated['response'];
+$projectRequest->save();
+
+$technicalReport = TechnicalReport::where(
+        'req_id',
+        $projectRequest->id
+    )
+    ->orderByDesc('report_id')
+    ->firstOrFail();
+
+$manager = User::find($proposal->manager_id);
+
+$pdf = Pdf::loadView('pdf.proposal', [
+    'proposal' => $proposal->fresh(),
+    'projectRequest' => $projectRequest,
+    'technicalReport' => $technicalReport,
+    'manager' => $manager,
+]);
+
+if ($proposal->pdf_path) {
+    Storage::disk('public')->put(
+        $proposal->pdf_path,
+        $pdf->output()
     );
+}
 
-    if ($projectRequest) {
-        $projectRequest->status = $validated['response'];
-        $projectRequest->save();
-    }
-
-    return redirect()
-        ->route('client.dashboard')
-        ->with(
-            'proposal_response_success',
-            'Your response was sent successfully.'
-        );
-
+return redirect()
+    ->route('client.dashboard')
+    ->with(
+        'proposal_response_success',
+        'Your response was sent successfully.'
+    );
 })->name('proposal.respond');
 
 
@@ -382,9 +402,9 @@ Route::post('/proposal/{id}/respond', function (
     });
     Route::middleware(['auth'])->group(function () {
     Route::post(
-        '/manager/requests/{requestId}/send-proposal',
-        [ProposalController::class, 'sendToClient']
-    )->name('manager.proposals.send');
+    '/manager/proposal/{id}/send-client',
+    [ProposalController::class, 'sendToClient']
+)->name('proposal.send.client');
 });
     /*
     |--------------------------------------------------------------------------
