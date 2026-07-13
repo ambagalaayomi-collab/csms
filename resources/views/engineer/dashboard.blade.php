@@ -558,8 +558,8 @@
                     <span><i class="fas fa-file-alt"></i></span> <text>Technical Report</text>
                 </a>
             </li>
-            <li><a href="#"><span><i class="fa-solid fa-chart-line"></i></span> <text>Status Updates</text></a></li>
-            <li><a href="#"><span><i class="fa-solid fa-boxes-stacked"></i></span> <text>Materials</text></a></li>
+            <!-- <li><a href="#"><span><i class="fa-solid fa-chart-line"></i></span> <text>Status Updates</text></a></li> -->
+            <!-- <li><a href="#"><span><i class="fa-solid fa-boxes-stacked"></i></span> <text>Materials</text></a></li> -->
             <li>
                 <form method="POST" action="{{ route('logout') }}" class="logout-form">
                     @csrf
