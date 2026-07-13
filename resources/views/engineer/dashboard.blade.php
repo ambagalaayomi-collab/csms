@@ -291,12 +291,38 @@
         }
 
         /* Main layout */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 5fr 1fr;
-    gap: 22px;
-            margin-bottom: 25px;
-        }
+        .status-update-card {
+    margin-bottom: 22px;
+}
+
+.status-update-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 220px;
+    gap: 18px;
+    align-items: end;
+}
+
+.status-update-form .form-group {
+    margin-bottom: 0;
+}
+
+.status-update-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
+}
+
+.status-update-form .submit-btn {
+    width: 100%;
+}
+
+@media (max-width: 900px) {
+    .status-update-form {
+        grid-template-columns: 1fr;
+    }
+}
 
         .card-title {
             font-size: 17px;
@@ -465,6 +491,38 @@
                 width: 100%;
                 border-radius: 0;
             }
+            .status-update-card {
+    margin-bottom: 22px;
+}
+
+.status-update-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 220px;
+    gap: 18px;
+    align-items: end;
+}
+
+.status-update-form .form-group {
+    margin-bottom: 0;
+}
+
+.status-update-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
+}
+
+.status-update-form .submit-btn {
+    width: 100%;
+}
+
+@media (max-width: 900px) {
+    .status-update-form {
+        grid-template-columns: 1fr;
+    }
+}
         }
     </style>
 </head>
@@ -512,7 +570,6 @@
             </li>
         </ul>
     </aside>
-
     <main class="main">
 
         <div class="topbar">
@@ -596,6 +653,73 @@
                     <a href="#" class="review-link">View All</a>
                 </div> -->
             </div>
+            <div class="card status-update-card">
+    <h3 class="card-title">Status Update</h3>
+
+    @if(isset($assignedRequests) && count($assignedRequests) > 0)
+
+        <form
+            method="POST"
+            action="{{ route('engineer.status.update') }}"
+            class="status-update-form"
+        >
+            @csrf
+
+            <div class="form-group">
+                <label>Request</label>
+
+                <select name="request_id" required>
+                    <option value="" disabled selected>
+                        Select Request
+                    </option>
+
+                    @foreach($assignedRequests as $request)
+                        <option value="{{ $request->id }}">
+                            R-{{ $request->id }} -
+                            {{ $request->project_type ?? $request->title }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Status</label>
+
+                <select name="status" required>
+                    <option value="" disabled selected>
+                        Update Status
+                    </option>
+
+                    <option value="In Progress">In Progress</option>
+                    <option value="Measurement Completed">
+                        Measurement Completed
+                    </option>
+                    <option value="Report Submitted">
+                        Report Submitted
+                    </option>
+                    <option value="Delayed">Delayed</option>
+                    <option value="Completed">Completed</option>
+                </select>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                Submit Update
+            </button>
+        </form>
+
+    @else
+
+        <p style="
+            font-size:13px;
+            color:#6b7280;
+            text-align:center;
+            padding:20px 0;
+        ">
+            No requests available for status updates.
+        </p>
+
+    @endif
+</div>
 
             <div class="main-grid">
                 <div class="card">
@@ -649,44 +773,18 @@
                     </div>
                 </div>
 
-                <div class="card">
-                    <h3 class="card-title">Status Update</h3>
-                    @if(isset($assignedRequests) && count($assignedRequests) > 0)
-                        <form method="POST" action="{{ route('engineer.status.update') }}">
-                            @csrf
-                            <div class="form-group">
-                                <select name="request_id" required>
-                                    <option value="" disabled selected>Select Request</option>
-                                    @foreach($assignedRequests as $request)
-                                        <option value="{{ $request->id }}">
-                                            R-{{ $request->id }} - {{ $request->project_type ?? $request->title }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
 
-                            <div class="form-group">
-                                <select name="status" required>
-                                    <option value="" disabled selected>Update Status</option>
-                                    <option value="In Progress">In Progress</option>
-                                    <option value="Measurement Completed">Measurement Completed</option>
-                                    <option value="Report Submitted">Report Submitted</option>
-                                    <option value="Delayed">Delayed</option>
-                                    <option value="Completed">Completed</option>
-                                </select>
-                            </div>
+               
 
                             <div class="form-group">
                                 <!-- <textarea name="remarks" placeholder="Add update remarks..." required></textarea> -->
                             </div>
 
-                            <button type="submit" class="submit-btn">
-                                Submit Update
-                            </button>
+                           
                         </form>
-                    @else
-                        <p style="font-size: 13px; color: #6b7280; text-align: center; padding: 20px 0;">No requests available for status updates.</p>
-                    @endif
+                   
+                        <p style="font-size: 13px; color: #6b7280; text-align: center; padding: 20px 0;"></p>
+                    
                 </div>
             </div>
 

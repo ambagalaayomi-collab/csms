@@ -226,6 +226,8 @@
                     <option value="" disabled selected>Select Request ID</option>
                     @foreach($assignedRequests as $req)
                         <option value="{{ $req->id }}" 
+                                data-length="{{ $req->width }}"
+                                data-width="{{ $req->height }}"
                                 data-material="{{ ($req->estimate->cement_cost ?? 0) + ($req->estimate->sand_cost ?? 0) + ($req->estimate->steel_cost ?? 0) + ($req->estimate->brick_cost ?? 0) }}"
                                 data-labor="{{ ($req->estimate->mason_cost ?? 0) + ($req->estimate->carpenter_cost ?? 0) + ($req->estimate->helper_cost ?? 0) }}"
                                 data-equipment="{{ ($req->estimate->mixer_cost ?? 0) + ($req->estimate->excavator_cost ?? 0) + ($req->estimate->truck_cost ?? 0) }}"
@@ -242,15 +244,29 @@
             <div class="grid-row-3">
                 <div class="form-group">
                     <label class="form-label">Length (ft)</label>
-                    <input type="number" name="length" class="form-control" placeholder="e.g. 50" required>
+                    <input
+    type="number"
+    id="length"
+    name="length"
+    class="form-control"
+    placeholder="e.g. 50"
+    readonly
+    required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Width (ft)</label>
-                    <input type="number" name="width" class="form-control" placeholder="e.g. 40" required>
+                    <input type="number" id="width"name="width" class="form-control" placeholder="e.g. 40" readonly required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Area (sq.ft)</label>
-                    <input type="number" name="area" class="form-control" placeholder="e.g. 2000" required>
+                    <input
+    type="number"
+    id="area"
+    name="area"
+    class="form-control"
+    placeholder="e.g. 2000"
+    readonly
+    required>
                 </div>
             </div>
 
@@ -328,6 +344,14 @@
             const labor = parseFloat(selectedOption.getAttribute('data-labor')) || 0;
             const equipment = parseFloat(selectedOption.getAttribute('data-equipment')) || 0;
             const total = parseFloat(selectedOption.getAttribute('data-total')) || 0;
+
+            const length = parseFloat(selectedOption.dataset.length) || 0;
+             const width = parseFloat(selectedOption.dataset.width) || 0;
+          const area = length * width;
+
+              document.getElementById('length').value = length;
+             document.getElementById('width').value = width;
+            document.getElementById('area').value = area;
             
             document.getElementById('displayMaterial').value = 'Rs. ' + material.toLocaleString('en-US', {minimumFractionDigits: 2});
             document.getElementById('displayLabor').value = 'Rs. ' + labor.toLocaleString('en-US', {minimumFractionDigits: 2});
@@ -338,6 +362,7 @@
             document.getElementById('hiddenLabor').value = labor;
             document.getElementById('hiddenEquipment').value = equipment;
             document.getElementById('hiddenTotal').value = total;
+
         }
     </script>
 </body>

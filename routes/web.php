@@ -418,11 +418,20 @@ return redirect()
         
         Route::prefix('engineer')->name('engineer.')->group(function () {
             Route::get('/dashboard', function () {
-                $assignedRequests = ProjectRequest::with(['technicalReport', 'estimate'])
-                    ->where('assigned_engineer_id', Auth::id())
-                    ->latest()
-                    ->get();
-
+                $assignedRequests = ProjectRequest::with([
+        'technicalReport',
+        'estimate'
+    ])
+    ->where('assigned_engineer_id', Auth::id())
+    ->get()
+    ->sortByDesc(function ($request) {
+        return max(
+            $request->technicalReport?->updated_at?->timestamp ?? 0,
+            $request->estimate?->updated_at?->timestamp ?? 0,
+            $request->updated_at?->timestamp ?? 0
+        );
+    })
+    ->values();
                 return view('engineer.dashboard', [
                     'assignedRequests' => $assignedRequests,
                     'assignedCount' => $assignedRequests->count(),
