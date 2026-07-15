@@ -572,37 +572,161 @@
             background: #b45309;
         }
 
-        .table-footer {
-            text-align: center;
-            margin-top: 14px;
+        <style>
+    .table-footer {
+        text-align: center;
+        margin-top: 14px;
+    }
+
+    .table-footer a {
+        color: #047857;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 13px;
+    }
+
+    /* ==============================
+       SEARCH AND FILTER SECTION
+    ============================== */
+
+    .request-filter-form {
+        margin: 15px 0 22px;
+        width: 100%;
+    }
+
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .filter-group input,
+    .filter-group select {
+        height: 44px;
+        border: 1px solid #d1d5db;
+        border-radius: 9px;
+        padding: 0 14px;
+        font-size: 14px;
+        background: #ffffff;
+        color: #111827;
+        outline: none;
+        transition: 0.2s ease;
+    }
+
+    .filter-group input {
+        flex: 1;
+        min-width: 260px;
+    }
+
+    .filter-group select {
+        width: 190px;
+        cursor: pointer;
+    }
+
+    .filter-group input::placeholder {
+        color: #9ca3af;
+    }
+
+    .filter-group input:focus,
+    .filter-group select:focus {
+        border-color: #007a5c;
+        box-shadow: 0 0 0 3px rgba(0, 122, 92, 0.12);
+    }
+
+    .filter-btn {
+        height: 44px;
+        padding: 0 20px;
+        border: none;
+        border-radius: 9px;
+        background: #007a5c;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: 0.2s ease;
+    }
+
+    .filter-btn:hover {
+        background: #005f48;
+        transform: translateY(-1px);
+    }
+
+    .clear-filter-btn {
+        height: 44px;
+        padding: 0 18px;
+        border-radius: 9px;
+        background: #e5e7eb;
+        color: #374151;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.2s ease;
+    }
+
+    .clear-filter-btn:hover {
+        background: #d1d5db;
+        color: #111827;
+    }
+
+    /* ==============================
+       RESPONSIVE DESIGN
+    ============================== */
+
+    @media (max-width: 1000px) {
+        .dashboard {
+            flex-direction: column;
         }
 
-        .table-footer a {
-            color: #047857;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 13px;
+        .sidebar {
+            width: 100%;
+            border-radius: 0;
         }
 
-        @media (max-width: 1000px) {
-            .dashboard {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                border-radius: 0;
-            }
-
-            .stats-grid,
-            .middle-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .progress-content {
-                flex-direction: column;
-            }
+        .stats-grid,
+        .middle-grid {
+            grid-template-columns: 1fr;
         }
+
+        .progress-content {
+            flex-direction: column;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .content {
+            padding: 18px;
+        }
+
+        .topbar {
+            padding: 0 18px;
+        }
+
+        .filter-group {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-group input,
+        .filter-group select,
+        .filter-btn,
+        .clear-filter-btn {
+            width: 100%;
+            min-width: 100%;
+        }
+    }
+
+
+
+
     </style>
 </head>
 <body>
@@ -829,63 +953,192 @@
 
             </div>
 
-            <!-- My Requests Table -->
-            <div class="table-card" id="recentRequests">
-                <h3 class="card-title">My Recent Project Requests</h3>
+         <!-- My Requests Table -->
+<div class="table-card" id="recentRequests">
+    <h3 class="card-title">My Recent Project Requests</h3>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Request ID</th>
-                            <th>Project Type</th>
-                            <th>Location</th>
-                            <th>Width</th>
-                            <th>Height</th>
-                            <th>Budget</th>
-                            <th>Timeline</th>
-                            <th>Status</th>
-                            <th>Submitted Date</th>
-                        </tr>
-                    </thead>
+    <form method="GET"
+          action="{{ route('client.dashboard') }}"
+          class="request-filter-form">
 
-                    <tbody>
-                        @forelse($myRequests ?? [] as $request)
-                            <tr>
-                                <td>R-{{ str_pad($request->id, 4, '0', STR_PAD_LEFT) }}</td>
-                                <td>{{ $request->project_type }}</td>
-                                <td>{{ $request->location }}</td>
-                                 <td>{{ $request->width }} m</td>
-                                <td>{{ $request->height }} m</td>
-                                <td>LKR {{ number_format($request->budget, 2) }}</td>
-                                <td>{{ $request->timeline }}</td>
-                                <td>
-                                    @if($request->status === 'Pending')
-                                        <span class="status pending">Pending</span>
-                                    @elseif($request->status === 'Approved')
-                                        <span class="status approved">Approved</span>
-                                    @elseif($request->status === 'Completed')
-                                        <span class="status completed">Completed</span>
-                                    @elseif($request->status === 'Rejected')
-                                        <span class="status rejected">Rejected</span>
-                                    @elseif($request->status === 'Changes Requested')
-                                        <span class="status under-review">Changes Requested</span>
-                                    @elseif($request->status === 'Proposal Sent')
-                                        <span class="status in-progress">Proposal Sent</span>
-                                    @else
-                                        <span class="status in-progress">{{ $request->status }}</span>
-                                    @endif
-                                </td>
-                                <td>{{ $request->created_at->format('M d, Y') }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" style="text-align:center; color:#6b7280;">
-                                    No project requests submitted yet.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+        <div class="filter-group">
+
+            <input type="text"
+                   name="search"
+                   value="{{ request('search') }}"
+                   placeholder="Search ID, Project Type or Location">
+
+            <select name="status">
+                <option value="">All Statuses</option>
+
+                <option value="Pending"
+                    {{ request('status') == 'Pending' ? 'selected' : '' }}>
+                    Pending
+                </option>
+
+                <option value="Assigned"
+                    {{ request('status') == 'Assigned' ? 'selected' : '' }}>
+                    Assigned
+                </option>
+
+                <option value="Approved"
+                    {{ request('status') == 'Approved' ? 'selected' : '' }}>
+                    Approved
+                </option>
+
+                <option value="Rejected"
+                    {{ request('status') == 'Rejected' ? 'selected' : '' }}>
+                    Rejected
+                </option>
+
+                <option value="Changes Requested"
+                    {{ request('status') == 'Changes Requested' ? 'selected' : '' }}>
+                    Changes Requested
+                </option>
+
+                <option value="Proposal Sent"
+                    {{ request('status') == 'Proposal Sent' ? 'selected' : '' }}>
+                    Proposal Sent
+                </option>
+
+                <option value="Completed"
+                    {{ request('status') == 'Completed' ? 'selected' : '' }}>
+                    Completed
+                </option>
+            </select>
+
+            <button type="submit" class="filter-btn">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                Search
+            </button>
+
+            @if(request('search') || request('status'))
+                <a href="{{ route('client.dashboard') }}"
+                   class="clear-filter-btn">
+                    Clear
+                </a>
+            @endif
+
+        </div>
+
+    </form>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Request ID</th>
+                <th>Project Type</th>
+                <th>Location</th>
+                <th>Width</th>
+                <th>Height</th>
+                <th>Budget</th>
+                <th>Timeline</th>
+                <th>Status</th>
+                <th>Submitted Date</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @forelse($myRequests as $projectRequest)
+
+                <tr>
+
+                    <td>
+                        R-{{ str_pad($projectRequest->id, 4, '0', STR_PAD_LEFT) }}
+                    </td>
+
+                    <td>{{ $projectRequest->project_type }}</td>
+
+                    <td>{{ $projectRequest->location }}</td>
+
+                    <td>{{ $projectRequest->width }} m</td>
+
+                    <td>{{ $projectRequest->height }} m</td>
+
+                    <td>
+                        LKR {{ number_format($projectRequest->budget, 2) }}
+                    </td>
+
+                    <td>{{ $projectRequest->timeline }}</td>
+
+                    <td>
+
+                        @if($projectRequest->status == 'Pending')
+                            <span class="status pending">
+                                Pending
+                            </span>
+
+                        @elseif($projectRequest->status == 'Assigned')
+                            <span class="status in-progress">
+                                Assigned
+                            </span>
+
+                        @elseif($projectRequest->status == 'Approved')
+                            <span class="status approved">
+                                Approved
+                            </span>
+
+                        @elseif($projectRequest->status == 'Completed')
+                            <span class="status completed">
+                                Completed
+                            </span>
+
+                        @elseif($projectRequest->status == 'Rejected')
+                            <span class="status rejected">
+                                Rejected
+                            </span>
+
+                        @elseif($projectRequest->status == 'Changes Requested')
+                            <span class="status under-review">
+                                Changes Requested
+                            </span>
+
+                        @elseif($projectRequest->status == 'Proposal Sent')
+                            <span class="status in-progress">
+                                Proposal Sent
+                            </span>
+
+                        @else
+                            <span class="status in-progress">
+                                {{ $projectRequest->status }}
+                            </span>
+                        @endif
+
+                    </td>
+
+                    <td>
+                        {{ $projectRequest->created_at->format('M d, Y') }}
+                    </td>
+
+                </tr>
+
+            @empty
+
+                <tr>
+
+                    <td colspan="9"
+                        style="text-align:center; color:#6b7280;">
+
+                        @if(request('search') || request('status'))
+                            No matching project requests found.
+                        @else
+                            No project requests submitted yet.
+                        @endif
+
+                    </td>
+
+                </tr>
+
+            @endforelse
+
+        </tbody>
+
+    </table>
+
+</div>
+
 
                 <div class="table-footer">
                     <a href="{{ route('client.request.project') }}">Submit New Request</a>

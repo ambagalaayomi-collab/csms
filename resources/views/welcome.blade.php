@@ -596,7 +596,7 @@
     <div class="login-modal-box">
 
         <div class="login-modal-header">
-            <h2>Login to System</h2>
+            <h2>Sign-in to System</h2>
             <span class="close-login-modal" id="closeLoginModal">&times;</span>
         </div>
 
@@ -651,11 +651,11 @@
                 <a href="#">Forgot password?</a>
             </div>
 
-            <button type="submit" class="modal-login-btn">Login</button>
+            <button type="submit" class="modal-login-btn">🔑 Sign-in</button>
 
             <div class="modal-register">
                 Don’t have an account?
-                <a href="#" id="switchToRegister">Register</a>
+                <a href="#" id="switchToRegister">⚙️Sign-up</a>
             </div>
         </form>
 
@@ -715,11 +715,11 @@
                 </select>
             </div>
 
-            <button type="submit" class="modal-register-btn">Register</button>
+            <button type="submit" class="modal-register-btn">Sign-up</button>
 
             <div class="modal-login-link">
                 Already have an account?
-                <a href="#" id="switchToLogin">Login</a>
+                <a href="#" id="switchToLogin">🔑Sign-in</a>
             </div>
         </form>
 
@@ -746,8 +746,8 @@
     </nav>
 
     <div class="nav-buttons">
-        <a href="#" class="login-btn" id="openLoginModal">Login</a>
-        <a href="#" class="register-btn" id="openRegisterModal">Register</a>
+        <a href="#" class="login-btn" id="openLoginModal">🔑Sign-in</a>
+        <a href="#" class="register-btn" id="openRegisterModal">⚙️Sign-up</a>
     </div>
 </header>
 

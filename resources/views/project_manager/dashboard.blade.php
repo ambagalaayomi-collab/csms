@@ -685,6 +685,131 @@
         .submit-proposal-btn:hover {
             background: #047857;
         }
+        /* =====================================
+   MANAGER SEARCH AND FILTER
+===================================== */
+
+.manager-filter-form {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.manager-filter-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.manager-search-box {
+    position: relative;
+    flex: 1;
+    min-width: 280px;
+}
+
+.manager-search-box i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.manager-search-box input {
+    width: 100%;
+    height: 44px;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    padding: 0 14px 0 40px;
+    background: #ffffff;
+    color: #111827;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s ease;
+}
+
+.manager-search-box input::placeholder {
+    color: #9ca3af;
+}
+
+.manager-status-filter {
+    width: 190px;
+    height: 44px;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    padding: 0 12px;
+    background: #ffffff;
+    color: #111827;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.manager-search-box input:focus,
+.manager-status-filter:focus {
+    border-color: #047857;
+    box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.12);
+}
+
+.manager-search-btn {
+    height: 44px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 9px;
+    background: #007a5c;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: 0.2s ease;
+}
+
+.manager-search-btn:hover {
+    background: #005f48;
+    transform: translateY(-1px);
+}
+
+.manager-clear-btn {
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 9px;
+    background: #e5e7eb;
+    color: #374151;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: 0.2s ease;
+}
+
+.manager-clear-btn:hover {
+    background: #d1d5db;
+    color: #111827;
+}
+
+@media (max-width: 768px) {
+    .manager-filter-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .manager-search-box,
+    .manager-status-filter,
+    .manager-search-btn,
+    .manager-clear-btn {
+        width: 100%;
+        min-width: 100%;
+    }
+}
 
     </style>
 </head>
@@ -870,6 +995,82 @@
                     <h3 class="card-title">
                         Client Request Notifications & Proposal Management
                     </h3>
+
+                    <form method="GET"
+      <form method="GET"
+      action="{{ route('project.manager.dashboard') }}"
+      class="manager-filter-form">
+
+    <div class="manager-filter-group">
+
+        <div class="manager-search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            <input type="text"
+                   name="search"
+                   value="{{ request('search') }}"
+                   placeholder="Search ID, client, project or location">
+        </div>
+
+        <select name="status" class="manager-status-filter">
+            <option value="">All Statuses</option>
+
+            <option value="Pending"
+                {{ request('status') === 'Pending' ? 'selected' : '' }}>
+                Pending
+            </option>
+
+            <option value="Assigned"
+                {{ request('status') === 'Assigned' ? 'selected' : '' }}>
+                Assigned
+            </option>
+
+            <option value="In Review"
+                {{ request('status') === 'In Review' ? 'selected' : '' }}>
+                In Review
+            </option>
+
+            <option value="Proposal Sent"
+                {{ request('status') === 'Proposal Sent' ? 'selected' : '' }}>
+                Proposal Sent
+            </option>
+
+            <option value="Approved"
+                {{ request('status') === 'Approved' ? 'selected' : '' }}>
+                Approved
+            </option>
+
+            <option value="Rejected"
+                {{ request('status') === 'Rejected' ? 'selected' : '' }}>
+                Rejected
+            </option>
+
+            <option value="Changes Requested"
+                {{ request('status') === 'Changes Requested' ? 'selected' : '' }}>
+                Changes Requested
+            </option>
+
+            <option value="Completed"
+                {{ request('status') === 'Completed' ? 'selected' : '' }}>
+                Completed
+            </option>
+        </select>
+
+        <button type="submit" class="manager-search-btn">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Search
+        </button>
+
+        @if(request('search') || request('status'))
+            <a href="{{ route('project.manager.dashboard') }}"
+               class="manager-clear-btn">
+                <i class="fa-solid fa-rotate-left"></i>
+                Clear
+            </a>
+        @endif
+
+    </div>
+</form>
 
                     <div class="request-action-panel" id="requestActions">
                         <h3>
@@ -1117,12 +1318,18 @@
 </td>
                                     </tr>
                                 @empty
-                                    <tr>
-                                        <td colspan="10" class="empty-row">
-                                            No request notifications found.
-                                        </td>
-                                    </tr>
-                                @endforelse
+    <tr>
+        <td colspan="10" class="empty-row">
+
+            @if(request('search') || request('status'))
+                No matching client requests found.
+            @else
+                No request notifications found.
+            @endif
+
+        </td>
+    </tr>
+@endforelse
                             </tbody>
                         </table>
                     </div>

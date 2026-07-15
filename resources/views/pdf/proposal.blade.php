@@ -352,9 +352,9 @@
                 <li>This proposal is valid for 30 days from the issue date.</li>
                 <li>Payment shall be made according to agreed project milestones.</li>
                 <li>Construction work will commence after written client approval.</li>
-                <li>Material price variations may affect the final project cost.</li>
+                <!-- <li>Material price variations may affect the final project cost.</li>
                 <li>Project completion may be affected by weather and unforeseen site conditions.</li>
-                <li>Additional work requested by the client may incur additional charges.</li>
+                <li>Additional work requested by the client may incur additional charges.</li> -->
             </ol>
         </div>
     </div>

@@ -524,6 +524,114 @@
     }
 }
         }
+
+        /* =====================================
+   ENGINEER SEARCH AND FILTER
+===================================== */
+
+.request-filter-form {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.filter-group input,
+.filter-group select {
+    height: 44px;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #111827;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s ease;
+}
+
+.filter-group input {
+    flex: 1;
+    min-width: 280px;
+    padding: 0 14px;
+}
+
+.filter-group select {
+    width: 210px;
+    padding: 0 12px;
+    cursor: pointer;
+}
+
+.filter-group input::placeholder {
+    color: #9ca3af;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    border-color: #007a5c;
+    box-shadow: 0 0 0 3px rgba(0, 122, 92, 0.12);
+}
+
+.filter-btn {
+    height: 44px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 9px;
+    background: #007a5c;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: 0.2s ease;
+}
+
+.filter-btn:hover {
+    background: #005f48;
+    transform: translateY(-1px);
+}
+
+.clear-filter-btn {
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 9px;
+    background: #e5e7eb;
+    color: #374151;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s ease;
+}
+
+.clear-filter-btn:hover {
+    background: #d1d5db;
+    color: #111827;
+}
+
+@media (max-width: 768px) {
+    .filter-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-group input,
+    .filter-group select,
+    .filter-btn,
+    .clear-filter-btn {
+        width: 100%;
+        min-width: 100%;
+    }
+}
     </style>
 </head>
 <body>
@@ -722,8 +830,42 @@
 </div>
 
             <div class="main-grid">
-                <div class="card">
+                <div class="card" id="assignedRequests">
                     <h3 class="card-title">My Assigned Requests</h3>
+                    <form method="GET"
+      action="{{ route('engineer.dashboard') }}#assignedRequests"
+      class="request-filter-form">
+
+    <div class="filter-group">
+
+        <input type="text"
+               name="search"
+               value="{{ request('search') }}"
+               placeholder="Search ID, Project Type, Client or Location">
+
+        <select name="status">
+            <option value="">All Statuses</option>
+            <option value="Assigned" {{ request('status')=='Assigned' ? 'selected' : '' }}>Assigned</option>
+            <option value="In Progress" {{ request('status')=='In Progress' ? 'selected' : '' }}>In Progress</option>
+            <option value="Measurement Completed" {{ request('status')=='Measurement Completed' ? 'selected' : '' }}>Measurement Completed</option>
+            <option value="Report Submitted" {{ request('status')=='Report Submitted' ? 'selected' : '' }}>Report Submitted</option>
+            <option value="Completed" {{ request('status')=='Completed' ? 'selected' : '' }}>Completed</option>
+        </select>
+
+        <button type="submit" class="filter-btn">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Search
+        </button>
+
+        @if(request('search') || request('status'))
+            <a href="{{ route('engineer.dashboard') }}#assignedRequests"
+               class="clear-filter-btn">
+                Clear
+            </a>
+        @endif
+
+    </div>
+</form>
                     <table>
                         <thead>
                             <tr>
@@ -758,12 +900,12 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" style="text-align: center; color: #6b7280;">No assigned requests found</td>
+                                        <td colspan="9" style="text-align: center; color: #6b7280;">No assigned requests found</td>
                                     </tr>
                                 @endforelse
                             @else
                                 <tr>
-                                    <td colspan="5" style="text-align: center; color: #6b7280;">No assigned requests found</td>
+                                    <td colspan="9" style="text-align: center; color: #6b7280;">No assigned requests found</td>
                                 </tr>
                             @endif
                         </tbody>

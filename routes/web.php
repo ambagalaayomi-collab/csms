@@ -151,18 +151,33 @@ Route::group(['middleware' => ['auth']], function () {
             return redirect()->route('client.dashboard')->with('request_success', 'Project request submitted successfully.');
         })->name('project.request.store');
 
-       Route::get('/client/dashboard', function () {
+       Route::get('/client/dashboard', function (Request $request) {
 
     $clientId = Auth::id();
 
+    $search = $request->input('search');
+    $status = $request->input('status');
+
     $myRequests = ProjectRequest::where('client_id', $clientId)
+        ->when($search, function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('id', 'like', '%' . $search . '%')
+                    ->orWhere('project_type', 'like', '%' . $search . '%')
+                    ->orWhere('location', 'like', '%' . $search . '%');
+            });
+        })
+        ->when($status, function ($query) use ($status) {
+            $query->where('status', $status);
+        })
         ->latest()
         ->get();
 
-    $myProposals = Proposal::whereHas('projectRequest', function ($query) use ($clientId) {
+    $myProposals = Proposal::whereHas(
+        'projectRequest',
+        function ($query) use ($clientId) {
             $query->where('client_id', $clientId);
-        })
-        // ->where('status', 'Sent')
+        }
+    )
         ->whereNotNull('pdf_path')
         ->latest()
         ->get();
@@ -170,17 +185,27 @@ Route::group(['middleware' => ['auth']], function () {
     return view('client.dashboard', [
         'myRequests' => $myRequests,
         'myProposals' => $myProposals,
-        'totalRequests' => $myRequests->count(),
-        'pendingRequests' => $myRequests->where('status', 'Pending')->count(),
-        'approvedRequests' => $myRequests->where('status', 'Approved')->count(),
-        'completedRequests' => $myRequests->where('status', 'Completed')->count(),
+        'totalRequests' => ProjectRequest::where(
+            'client_id',
+            $clientId
+        )->count(),
+        'pendingRequests' => ProjectRequest::where(
+            'client_id',
+            $clientId
+        )->where('status', 'Pending')->count(),
+        'approvedRequests' => ProjectRequest::where(
+            'client_id',
+            $clientId
+        )->where('status', 'Approved')->count(),
+        'completedRequests' => ProjectRequest::where(
+            'client_id',
+            $clientId
+        )->where('status', 'Completed')->count(),
         'proposalCount' => $myProposals->count(),
         'notificationCount' => $myProposals->count(),
     ]);
 
-
 })->name('client.dashboard');
-
 
 Route::post('/proposal/{id}/respond', function (
     Request $request,
@@ -263,29 +288,95 @@ return redirect()
         return $next($request);
     }]], function () {
 
-        Route::get('/project-manager/dashboard', function () {
-            $clientRequests = ProjectRequest::with(['technicalReport', 'estimate'])
-                ->latest()
-                ->get();
-            $proposals = Proposal::latest()->get();
+        Route::get('/project-manager/dashboard', function (Request $request) {
 
-            return view('project_manager.dashboard', [
-                'clientRequests' => $clientRequests,
-                'proposals' => $proposals,
-                'totalRequests' => $clientRequests->count(),
-                'pendingRequests' => $clientRequests->where('status', 'Pending')->count(),
-                'inReviewRequests' => $clientRequests->where('status', 'In Review')->count(),
-                'approvedRequests' => $clientRequests->where('status', 'Approved')->count(),
-                'rejectedRequests' => $clientRequests->where('status', 'Rejected')->count(),
-                'changesRequested' => $clientRequests->where('status', 'Changes Requested')->count(),
-                'proposalSentRequests' => $clientRequests->where('status', 'Proposal Sent')->count(),
-                'proposalCount' => $proposals->count(),
-                'sentProposals' => $proposals->where('status', 'Sent')->count(),
-                'approvedProposals' => $proposals->where('status', 'Approved')->count(),
-                'rejectedProposals' => $proposals->where('status', 'Rejected')->count(),
-                'changedProposals' => $proposals->where('status', 'Changes Requested')->count(),
-            ]);
-        })->name('project.manager.dashboard');
+    $search = trim((string) $request->query('search', ''));
+    $status = $request->query('status');
+
+    // R-0005 ලෙස search කළත් database ID 5 ලෙස හඳුනාගැනීමට
+    $searchId = preg_replace('/[^0-9]/', '', $search);
+
+    $clientRequests = ProjectRequest::with([
+            'technicalReport',
+            'estimate'
+        ])
+        ->when($search !== '', function ($query) use ($search, $searchId) {
+
+            $query->where(function ($subQuery) use ($search, $searchId) {
+
+                $subQuery
+                    ->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('project_type', 'like', "%{$search}%")
+                    ->orWhere('location', 'like', "%{$search}%");
+
+                if ($searchId !== '') {
+                    $subQuery->orWhere('id', $searchId);
+                }
+            });
+        })
+        ->when(!empty($status), function ($query) use ($status) {
+            $query->where('status', $status);
+        })
+        ->latest()
+        ->get();
+
+    $proposals = Proposal::latest()->get();
+
+    // Dashboard cards සඳහා filter නොකළ සියලු requests
+    $allClientRequests = ProjectRequest::all();
+
+    return view('project_manager.dashboard', [
+        'clientRequests' => $clientRequests,
+        'proposals' => $proposals,
+
+        'totalRequests' => $allClientRequests->count(),
+
+        'pendingRequests' => $allClientRequests
+            ->where('status', 'Pending')
+            ->count(),
+
+        'inReviewRequests' => $allClientRequests
+            ->where('status', 'In Review')
+            ->count(),
+
+        'approvedRequests' => $allClientRequests
+            ->where('status', 'Approved')
+            ->count(),
+
+        'rejectedRequests' => $allClientRequests
+            ->where('status', 'Rejected')
+            ->count(),
+
+        'changesRequested' => $allClientRequests
+            ->where('status', 'Changes Requested')
+            ->count(),
+
+        'proposalSentRequests' => $allClientRequests
+            ->where('status', 'Proposal Sent')
+            ->count(),
+
+        'proposalCount' => $proposals->count(),
+
+        'sentProposals' => $proposals
+            ->where('status', 'Sent')
+            ->count(),
+
+        'approvedProposals' => $proposals
+            ->where('status', 'Approved')
+            ->count(),
+
+        'rejectedProposals' => $proposals
+            ->where('status', 'Rejected')
+            ->count(),
+
+        'changedProposals' => $proposals
+            ->where('status', 'Changes Requested')
+            ->count(),
+    ]);
+
+})->name('project.manager.dashboard');
 
         Route::post('/project-request/{id}/status', function (Request $request, $id) {
             $validated = $request->validate([
@@ -417,12 +508,29 @@ return redirect()
     }]], function () {
         
         Route::prefix('engineer')->name('engineer.')->group(function () {
-            Route::get('/dashboard', function () {
-                $assignedRequests = ProjectRequest::with([
+            Route::get('/dashboard', function (Request $request) {
+$search = $request->input('search');
+$status = $request->input('status');
+
+$assignedRequests = ProjectRequest::with([
         'technicalReport',
         'estimate'
     ])
     ->where('assigned_engineer_id', Auth::id())
+
+    ->when($search, function ($query) use ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('id', 'like', "%{$search}%")
+              ->orWhere('project_type', 'like', "%{$search}%")
+              ->orWhere('name', 'like', "%{$search}%")
+              ->orWhere('location', 'like', "%{$search}%");
+        });
+    })
+
+    ->when($status, function ($query) use ($status) {
+        $query->where('status', $status);
+    })
+
     ->get()
     ->sortByDesc(function ($request) {
         return max(

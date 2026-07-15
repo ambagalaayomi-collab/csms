@@ -255,11 +255,11 @@
                     </select>
                 </div>
 
-                <button type="submit">Register</button>
+                <button type="submit">Sign-up </button>
             </form>
 
             <div class="login-link">
-                Already have an account? <a href="/login">Login</a>
+                Already have an account? <a href="/login">Sign-in</a>
             </div>
 
         </div>
