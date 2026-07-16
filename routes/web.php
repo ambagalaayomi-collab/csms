@@ -122,7 +122,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/project-request/store', function (Request $request) {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
-                'phone' => 'required|string|max:20',
+                'phone' => 'required|string|max:10',
                 'email' => 'required|email|max:255',
                 'project_type' => 'required|string|max:100',
                 'location' => 'required|string|max:255',

@@ -217,12 +217,14 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('engineer.technical_report.store') }}">
+        <form method="POST"
+      action="{{ route('engineer.technical_report.store') }}"
+      enctype="multipart/form-data">
             @csrf
 
             <div class="form-group" style="max-width: 400px;">
                 <label class="form-label">Project Request</label>
-                <select name="req_id" class="form-select" id="requestSelect" required onchange="loadCosts()">
+                <select name="req_id" class="form-select" id="requestSelect" required onchange="loadMeasurements()">
                     <option value="" disabled selected>Select Request ID</option>
                     @foreach($assignedRequests as $req)
                         <option value="{{ $req->id }}" 
@@ -270,33 +272,52 @@
                 </div>
             </div>
 
-            <div class="section-title">
-                <i class="fa-solid fa-dollar-sign"></i> COST ESTIMATION
-            </div>
-            <div class="grid-row">
-                <div class="form-group">
-                    <label class="form-label">Material Cost</label>
-                    <input type="text" id="displayMaterial" class="form-control" readonly value="Rs. 0.00">
-                    <input type="hidden" name="material_cost" id="hiddenMaterial" value="">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Labor Cost</label>
-                    <input type="text" id="displayLabor" class="form-control" readonly value="Rs. 0.00">
-                    <input type="hidden" name="labor_cost" id="hiddenLabor" value="">
-                </div>
-            </div>
-            <div class="grid-row">
-                <div class="form-group">
-                    <label class="form-label">Equipment Cost</label>
-                    <input type="text" id="displayEquipment" class="form-control" readonly value="Rs. 0.00">
-                    <input type="hidden" name="equipment_cost" id="hiddenEquipment" value="">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Total Estimated Cost</label>
-                    <input type="text" id="displayTotal" class="form-control cost-highlight" readonly value="Rs. 0.00">
-                    <input type="hidden" name="total_budget" id="hiddenTotal" value="">
-                </div>
-            </div>
+           <div class="section-title">
+    <i class="fa-solid fa-file-excel"></i>
+    COST ESTIMATE EXCEL
+</div>
+
+<div class="form-group">
+    <label class="form-label">
+        Upload Cost Estimate Excel
+    </label>
+
+    <input
+        type="file"
+        name="cost_estimate_file"
+        class="form-control"
+        accept=".xlsx,.xls"
+        required
+    >
+
+    <small style="color:#64748b;">
+        Upload the provided Unit Rate Estimate Excel template.
+    </small>
+
+    @error('cost_estimate_file')
+        <div style="color:#dc2626; margin-top:8px;">
+            {{ $message }}
+        </div>
+    @enderror
+</div>
+@if($errors->any())
+    <div style="
+        background:#fef2f2;
+        border-left:4px solid #dc2626;
+        color:#991b1b;
+        padding:14px 20px;
+        border-radius:8px;
+        margin-bottom:25px;
+    ">
+        <strong>Please correct the following errors:</strong>
+
+        <ul>
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 
             <div class="section-title">
                 <i class="fa-solid fa-clock"></i> ESTIMATED DURATION
@@ -336,34 +357,37 @@
     </div>
 
     <script>
-        function loadCosts() {
-            const selectElement = document.getElementById('requestSelect');
-            const selectedOption = selectElement.options[selectElement.selectedIndex];
-            
-            const material = parseFloat(selectedOption.getAttribute('data-material')) || 0;
-            const labor = parseFloat(selectedOption.getAttribute('data-labor')) || 0;
-            const equipment = parseFloat(selectedOption.getAttribute('data-equipment')) || 0;
-            const total = parseFloat(selectedOption.getAttribute('data-total')) || 0;
+    function loadMeasurements() {
+        const select =
+            document.getElementById('requestSelect');
 
-            const length = parseFloat(selectedOption.dataset.length) || 0;
-             const width = parseFloat(selectedOption.dataset.width) || 0;
-          const area = length * width;
+        const option =
+            select.options[select.selectedIndex];
 
-              document.getElementById('length').value = length;
-             document.getElementById('width').value = width;
-            document.getElementById('area').value = area;
-            
-            document.getElementById('displayMaterial').value = 'Rs. ' + material.toLocaleString('en-US', {minimumFractionDigits: 2});
-            document.getElementById('displayLabor').value = 'Rs. ' + labor.toLocaleString('en-US', {minimumFractionDigits: 2});
-            document.getElementById('displayEquipment').value = 'Rs. ' + equipment.toLocaleString('en-US', {minimumFractionDigits: 2});
-            document.getElementById('displayTotal').value = 'Rs. ' + total.toLocaleString('en-US', {minimumFractionDigits: 2});
-            
-            document.getElementById('hiddenMaterial').value = material;
-            document.getElementById('hiddenLabor').value = labor;
-            document.getElementById('hiddenEquipment').value = equipment;
-            document.getElementById('hiddenTotal').value = total;
-
+        if (!option || !option.value) {
+            document.getElementById('length').value = '';
+            document.getElementById('width').value = '';
+            document.getElementById('area').value = '';
+            return;
         }
-    </script>
+
+        const length =
+            parseFloat(option.dataset.length) || 0;
+
+        const width =
+            parseFloat(option.dataset.width) || 0;
+
+        const area = length * width;
+
+        document.getElementById('length').value =
+            length;
+
+        document.getElementById('width').value =
+            width;
+
+        document.getElementById('area').value =
+            area.toFixed(2);
+    }
+</script>
 </body>
 </html>

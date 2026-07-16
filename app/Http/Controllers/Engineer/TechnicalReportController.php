@@ -3,189 +3,295 @@
 namespace App\Http\Controllers\Engineer;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\ProjectRequest;
-use App\Models\UnitRate;
-use App\Models\Estimate; 
-use App\Models\TechnicalReport; 
+use App\Models\TechnicalReport;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Barryvdh\DomPDF\Facade\Pdf; 
+use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class TechnicalReportController extends Controller
 {
-    /**
-     * Estimates Form එක සහ Database Rates පෙන්වීම.
-     */
     public function create()
     {
         if (Auth::user()->role !== 'engineer') {
             abort(403);
         }
 
-        $assignedRequests = ProjectRequest::where('assigned_engineer_id', Auth::id())
+        $assignedRequests = ProjectRequest::where(
+            'assigned_engineer_id',
+            Auth::id()
+        )
             ->latest()
             ->get();
 
-        // unit_rates ටේබල් එකේ තියෙන ගණන් ටික array එකක් විදිහට ගන්නවා
-        $rates = UnitRate::pluck('rate', 'item_key')->toArray();
-
-        return view('engineer.estimates', compact('assignedRequests', 'rates'));
+        return view(
+            'engineer.estimates',
+            compact('assignedRequests')
+        );
     }
 
-    /**
-     * Form එකෙන් එන Quantities අරන්, Backend එකෙන් ගණන් හදලා Save කිරීම.
-     */
-    public function store(Request $request)
+    public function storeTechnicalReport(Request $request)
     {
         if (Auth::user()->role !== 'engineer') {
             abort(403);
         }
 
-        // 1. Blade Form එකේ Input Fields වල නම් (Names) අනුව Validate කිරීම
-        $request->validate([
-            'project_request_id'   => 'required|exists:project_requests,id',
-            'cement_qty'           => 'required|numeric|min:0',
-            'sand_qty'             => 'required|numeric|min:0',
-            'steel_qty'            => 'required|numeric|min:0',
-            'brick_qty'            => 'required|numeric|min:0',
-            'other_material_cost'  => 'required|numeric|min:0',
+        $validated = $request->validate([
+            'req_id' => [
+                'required',
+                'exists:project_requests,id',
+            ],
 
-            'mason_qty'            => 'required|numeric|min:0',
-            'carpenter_qty'        => 'required|numeric|min:0',
-            'helper_qty'           => 'required|numeric|min:0',
-            'other_labor_cost'     => 'required|numeric|min:0',
+            'length' => [
+                'required',
+                'numeric',
+                'min:0',
+            ],
 
-            'mixer_qty'            => 'required|numeric|min:0',
-            'excavator_qty'        => 'required|numeric|min:0',
-            'truck_qty'            => 'required|numeric|min:0',
-            'other_equipment_cost' => 'required|numeric|min:0',
+            'width' => [
+                'required',
+                'numeric',
+                'min:0',
+            ],
 
-            'estimated_duration'   => 'required|string',
-            'remarks'              => 'nullable|string',
+            'cost_estimate_file' => [
+                'required',
+                'file',
+                'mimes:xlsx,xls',
+                'max:5120',
+            ],
+
+            'estimated_duration' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'recommendations' => [
+                'nullable',
+                'string',
+            ],
+
+            'remarks' => [
+                'nullable',
+                'string',
+            ],
         ]);
 
-        // 2. Database එකෙන් ආරක්ෂිතව Rates Array එක ලබාගැනීම
-        $rates = UnitRate::pluck('rate', 'item_key')->toArray();
+        $projectRequest = ProjectRequest::where(
+            'id',
+            $validated['req_id']
+        )
+            ->where(
+                'assigned_engineer_id',
+                Auth::id()
+            )
+            ->firstOrFail();
 
-        // 3. --- AUTOMATIC COST CALCULATION (Qty * Rate) ---
-        // Materials Cost
-        $cementCost    = $request->cement_qty * ($rates['cement'] ?? 0);
-        $sandCost      = $request->sand_qty * ($rates['sand'] ?? 0);
-        $steelCost     = $request->steel_qty * ($rates['steel'] ?? 0);
-        $brickCost     = $request->brick_qty * ($rates['brick'] ?? 0);
-        $materialCost  = $cementCost + $sandCost + $steelCost + $brickCost + $request->other_material_cost;
+        $existingReport = TechnicalReport::where(
+            'req_id',
+            $validated['req_id']
+        )->exists();
 
-        // Labor Cost
-        $masonCost     = $request->mason_qty * ($rates['mason'] ?? 0);
-        $carpenterCost = $request->carpenter_qty * ($rates['carpenter'] ?? 0);
-        $helperCost    = $request->helper_qty * ($rates['helper'] ?? 0);
-        $laborCost     = $masonCost + $carpenterCost + $helperCost + $request->other_labor_cost;
-
-        // Equipment Cost
-        $mixerCost     = $request->mixer_qty * ($rates['mixer'] ?? 0);
-        $excavatorCost = $request->excavator_qty * ($rates['excavator'] ?? 0);
-        $truckCost     = $request->truck_qty * ($rates['truck'] ?? 0);
-        $equipmentCost = $mixerCost + $excavatorCost + $truckCost + $request->other_equipment_cost;
-
-        // මුළු එකතුව (Grand Total)
-        $totalCost     = $materialCost + $laborCost + $equipmentCost;
-
-        // 4. Estimate ටේබල් එකට දත්ත සේව් කිරීම
-        Estimate::create([
-            'project_request_id'   => $request->project_request_id,
-            'engineer_id'          => Auth::id(),
-            'cement_cost'          => $cementCost,
-            'sand_cost'            => $sandCost,
-            'steel_cost'           => $steelCost,
-            'brick_cost'           => $brickCost,
-            'other_material_cost'  => $request->other_material_cost,
-            'mason_cost'           => $masonCost,
-            'carpenter_cost'       => $carpenterCost,
-            'helper_cost'          => $helperCost,
-            'other_labor_cost'     => $request->other_labor_cost,
-            'mixer_cost'           => $mixerCost,
-            'excavator_cost'       => $excavatorCost,
-            'truck_cost'           => $truckCost,
-            'other_equipment_cost' => $request->other_equipment_cost,
-            'material_cost'        => $materialCost,
-            'labor_cost'           => $laborCost,
-            'equipment_cost'       => $equipmentCost,
-            'total_cost'           => $totalCost,
-            'estimated_duration'   => $request->estimated_duration,
-            'remarks'              => $request->remarks,
-        ]);
-
-        return back()->with('success', 'Estimate calculated and saved successfully.');
-    }
-
-    /**
-     * Technical Report එක ඩේටාබේස් එකට සේව් කර සැනින් PDF එකක් ලෙස පෙන්වීම.
-     */
-    public function storeTechnicalReport(Request $request)
-    {
-        // 1. Form Validation
-        $request->validate([
-            'req_id'             => 'required',
-            'length'             => 'required|numeric',
-            'width'              => 'required|numeric',
-            'area'               => 'required|numeric',
-            'material_cost'      => 'required|numeric',
-            'labor_cost'         => 'required|numeric',
-            'equipment_cost'     => 'required|numeric',
-            'total_budget'       => 'required|numeric',
-            'estimated_duration' => 'required|string',
-            'recommendations'    => 'nullable|string',
-            'remarks'            => 'nullable|string',
-        ]);
-
-        // 2. Database එකේ තියෙන ඇත්තම Column නම් වලට අනුව නව Report එකක් සෑදීම
-        $report = new TechnicalReport();
-        $report->req_id = $request->req_id; 
-        
-        // මිනුම් විස්තර සහ සටහන් එකතු කර string එකක් ලෙස සකසා සේව් කිරීම
-        $report->measurement_details = "Length: " . $request->length . " ft, Width: " . $request->width . " ft, Area: " . $request->area . " sq.ft. \nRecommendations: " . $request->recommendations . " \nRemarks: " . $request->remarks; 
-        
-        $report->total_budget = $request->total_budget ?? 0;
-        $report->duration     = $request->estimated_duration; 
-        $report->date         = now()->toDateString(); 
-        $report->material_cost = $request->material_cost;
-            $report->labor_cost = $request->labor_cost;
-             $report->equipment_cost = $request->equipment_cost;
-            $report->estimated_duration = $request->estimated_duration;
-             $report->length = $request->length;
-           $report->width = $request->width;
-           $report->area = $request->area;
-           $report->recommendations = $request->recommendations;
-           $report->remarks = $request->remarks;
-        
-        $report->save(); 
-
-        
-        $report->load('projectRequest'); 
-        $requestData = ProjectRequest::find($request->req_id);
-
-      
-        $pdf = Pdf::loadView('pdf.technical_report_pdf', compact('report', 'requestData'));
-        
-        return $pdf->stream('technical_report_R-' . $request->req_id . '.pdf');
-    }
-
-    
-    public function generatePDF($id)
-    {
-       
-        $requestData = ProjectRequest::with('technicalReport')->findOrFail($id);
-
-        
-        $report = $requestData->technicalReport;
-
-        
-        if (!$report) {
-            return back()->with('error', 'Technical report not found for this request.');
+        if ($existingReport) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'req_id' =>
+                        'Technical report already exists for this request.',
+                ]);
         }
 
-       
-        $pdf = Pdf::loadView('pdf.technical_report_pdf', compact('report', 'requestData'));
-        return $pdf->stream('technical_report_R-' . $id . '.pdf');
+        $excelFile = $request->file(
+            'cost_estimate_file'
+        );
+
+        try {
+            $spreadsheet = IOFactory::load(
+                $excelFile->getRealPath()
+            );
+
+            $sheet = $spreadsheet->getSheetByName(
+                'Unit Rate Estimate'
+            );
+
+            if (!$sheet) {
+                return back()
+                    ->withInput()
+                    ->withErrors([
+                        'cost_estimate_file' =>
+                            'Invalid Excel file. Sheet name must be Unit Rate Estimate.',
+                    ]);
+            }
+
+            $materialCost = (float) $sheet
+                ->getCell('G16')
+                ->getCalculatedValue();
+
+            $laborCost = (float) $sheet
+                ->getCell('G17')
+                ->getCalculatedValue();
+
+            $equipmentCost = (float) $sheet
+                ->getCell('G18')
+                ->getCalculatedValue();
+
+            $totalBudget = (float) $sheet
+                ->getCell('G19')
+                ->getCalculatedValue();
+
+        } catch (\Throwable $exception) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'cost_estimate_file' =>
+                        'Excel file could not be read. Please use the provided Excel template.',
+                ]);
+        }
+
+        $calculatedTotal =
+            $materialCost +
+            $laborCost +
+            $equipmentCost;
+
+        if (abs($calculatedTotal - $totalBudget) > 0.01) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'cost_estimate_file' =>
+                        'Excel Grand Total does not match category totals.',
+                ]);
+        }
+
+        $excelPath = $excelFile->store(
+            'cost-estimates',
+            'public'
+        );
+
+        try {
+            $report = new TechnicalReport();
+
+            $report->req_id =
+                $validated['req_id'];
+
+            $report->date =
+                now()->toDateString();
+
+            $report->length =
+                $validated['length'];
+
+            $report->width =
+                $validated['width'];
+
+            $report->area =
+                $validated['length'] *
+                $validated['width'];
+
+            $report->cost_estimate_file =
+                $excelPath;
+
+            $report->material_cost =
+                $materialCost;
+
+            $report->labor_cost =
+                $laborCost;
+
+            $report->equipment_cost =
+                $equipmentCost;
+
+            $report->total_budget =
+                $totalBudget;
+
+            $report->estimated_duration =
+                $validated['estimated_duration'];
+
+            /*
+             * duration column එක database එකේ NOT NULL නිසා
+             * save කිරීමට කලින් value එක set කරනවා.
+             */
+            $report->duration =
+                $validated['estimated_duration'];
+
+            $report->recommendations =
+                $validated['recommendations'] ?? null;
+
+            $report->remarks =
+                $validated['remarks'] ?? null;
+
+            $report->save();
+
+        } catch (\Throwable $exception) {
+            Storage::disk('public')->delete(
+                $excelPath
+            );
+
+            throw $exception;
+        }
+
+        $report->load('projectRequest');
+
+        $requestData = $projectRequest;
+
+        $pdf = Pdf::loadView(
+            'pdf.technical_report_pdf',
+            compact('report', 'requestData')
+        );
+
+        return $pdf->stream(
+            'technical_report_R-' .
+            $report->req_id .
+            '.pdf'
+        );
+    }
+
+    public function generatePDF($id)
+    {
+        $requestData = ProjectRequest::with(
+            'technicalReport'
+        )->findOrFail($id);
+
+        $report = $requestData->technicalReport;
+
+        if (!$report) {
+            return back()->with(
+                'error',
+                'Technical report not found for this request.'
+            );
+        }
+
+        $pdf = Pdf::loadView(
+            'pdf.technical_report_pdf',
+            compact('report', 'requestData')
+        );
+
+        return $pdf->stream(
+            'technical_report_R-' . $id . '.pdf'
+        );
+    }
+
+    public function downloadExcel($id)
+    {
+        $report = TechnicalReport::findOrFail($id);
+
+        if (
+            !$report->cost_estimate_file ||
+            !Storage::disk('public')->exists(
+                $report->cost_estimate_file
+            )
+        ) {
+            return back()->with(
+                'error',
+                'Cost estimate Excel file not found.'
+            );
+        }
+
+        return Storage::disk('public')->download(
+            $report->cost_estimate_file,
+            'cost_estimate_R-' .
+            $report->req_id .
+            '.xlsx'
+        );
     }
 }

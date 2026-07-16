@@ -651,11 +651,11 @@
                 <a href="#">Forgot password?</a>
             </div>
 
-            <button type="submit" class="modal-login-btn">🔑 Sign-in</button>
+            <button type="submit" class="modal-login-btn"> Sign-in</button>
 
             <div class="modal-register">
                 Don’t have an account?
-                <a href="#" id="switchToRegister">⚙️Sign-up</a>
+                <a href="#" id="switchToRegister">Sign-up</a>
             </div>
         </form>
 
@@ -746,8 +746,8 @@
     </nav>
 
     <div class="nav-buttons">
-        <a href="#" class="login-btn" id="openLoginModal">🔑Sign-in</a>
-        <a href="#" class="register-btn" id="openRegisterModal">⚙️Sign-up</a>
+        <a href="#" class="login-btn" id="openLoginModal">Sign-in</a>
+        <a href="#" class="register-btn" id="openRegisterModal">Sign-up</a>
     </div>
 </header>
 
